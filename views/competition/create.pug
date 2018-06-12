@@ -1,0 +1,44 @@
+extends ../layout
+
+block content
+	h1= title
+	p #{title}
+	.container
+		form.form-group(action='/create_room', method='post')
+			.row
+				container.col-md-4
+					input.form-control(type='text', name='title', placeholder="Título", required)
+					input.form-control(id="datetime", type="datetime-local", name='data_inicio' placeholder="Data", required)
+					input.form-control(id="datetime", type="datetime-local", name='data_fim' placeholder="Data", required)
+					textarea.form-control(type='text', name='description', placeholder="Descrição" cols="30", rows="10", required)
+					input.form-control(type='text', name='senha', placeholder="Senha")
+			button.btn.btn-primary.col-md-2(type="submit") Enviar
+	br
+	br
+block addItem
+	//- script.
+	//- 	$(document).ready(function() {
+	//- 		var max_fields      = 99999; //maximum input boxes allowed
+	//- 		var wrapper         = $(".input_fields_wrap"); //Fields wrapper
+	//- 		var add_button      = $("#addItem"); //Add button ID
+
+	//- 		var x = 1; //initlal text box count
+	//- 		$(add_button).click(function(e){ //on add input button click
+	//- 			e.preventDefault();
+	//- 			if(x < max_fields){ //max input box allowed
+	//- 				x++; //text box increment
+	//- 				$(wrapper).append(`
+	//- 						<input id="problem`+x+`" type="text" name="problem`+x+`" class="form-control"/>
+	//- 						<span class="remove_field">aa</span>`); //add input box
+	//- 			}
+	//- 		});
+
+	//- 		$(wrapper).on("click",".remove_field", function(e){ //user click on remove text
+	//- 			e.preventDefault(); $(this).parent('form').remove(); x--;
+	//- 		})
+
+
+	//- 		$('#formulario').click(function(){
+	//- 			alert("teste");
+	//- 		})
+	//- 	});

@@ -1,0 +1,17 @@
+body {
+	padding: 50px;
+  	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  	color: #00B7FF;
+}
+
+#arquivoInput.form-control {width: auto;}
+#addItem {margin-bottom: 10px;}
+.input_fields_wrap {margin-top: 15px;}
+.remove_field {color: red; margin-top: 15px; margin-left: 5px;}
+
+/* COMPETIÇÃO */
+  	/* Index */
+		.card {border: 2px solid #00B7FF; border-radius: 20px; padding: 20px;}

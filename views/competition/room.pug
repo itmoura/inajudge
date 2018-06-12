@@ -1,0 +1,57 @@
+extends ../layout
+
+block content
+    .container
+        .row
+            .col-md-8
+                h1= listaCompetiton.titulo
+                p Welcome to #{listaCompetiton.titulo}
+            //- se user.autor == user logado
+            //- Modal
+            .col-md-3
+                .pull-right
+                    button.btn.btn-primary(type="submit" data-toggle="modal" data-target='#addProblem') + Problema
+            
+    .container
+        .row
+            each lista, i in listProblems 
+                .col-md-3
+                    a.card(href=listaCompetiton._id+'/submit/'+lista._id)
+                        p #{lista.nome} 
+                            span #{lista.letra}
+                        p icone de balão
+    
+    .modal.fade(tabindex='-1', role='dialog', aria-labelledby='myLargeModalLabel', aria-hidden='true', id='addProblem')
+        .modal-dialog.modal-lg(role='document')
+            .modal-content
+                .modal-header
+                    h5#exampleModalLabel.modal-title Cadastrando problema
+                    button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') ×
+                form.form-group(action='/upload_problem/', method='post', enctype="multipart/form-data")
+                    .modal-body
+                        input(type="hidden", name="id_competition", value=listaCompetiton._id)
+                        input.form-control(type='text', name='nome', placeholder="Nome do problema")
+                        br
+                        input.form-control(type='text', name='letra', placeholder="Letra do problema")
+                        br
+                        input.form-control(type='number', name='limit_time', placeholder="Tempo Limite")
+                        br
+                        textarea.form-control(type='text', name='description', placeholder="Descrição" cols="30", rows="10", required)
+                        br
+                        textarea.form-control(type='text', name='txt_entrada', placeholder="Texto da Entrada" cols="30", rows="10", required)
+                        br
+                        textarea.form-control(type='text', name='txt_saida', placeholder="Texto da Saída" cols="30", rows="10", required)                                                                            
+                        br
+                        textarea.form-control(type='text', name='exp_entrada', placeholder="Exemplo de Entrada" cols="30", rows="10", required)                                                                            
+                        br
+                        textarea.form-control(type='text', name='exp_saida', placeholder="Exemplo de Saída" cols="30", rows="10", required)                                                                            
+                        br
+                        input.form-control(type="file", name="arquivo")
+                        p criado por @itmoura
+                    .modal-footer
+                        button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
+                        button.btn.btn-primary(type='submit') Finzalizar
+    block addItem
+            
+                                    
