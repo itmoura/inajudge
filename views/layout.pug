@@ -1,21 +1,32 @@
 doctype html
 html
-  head
-    title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    link(rel='stylesheet prefetch', href='/bootstrap/css/bootstrap.min.css')
-    // link(rel='stylesheet prefetch', href='/materialize/css/materialize.min.css')
-    link(href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet")
-    script(src='/jquery/jquery-3.3.1.min.js')
-    script(src='/jquery/jquery.tablesorter.min.js')
-    script(src='/bootstrap/js/bootstrap.min.js')
-    // script(src='/materialize/js/materialize.min.js')
-    script.
-      function goBack() {
-        window.history.back();
-      }
-    
-  body
-    block content
-  rodape
-    block addItem
+	head
+		title= title
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet prefetch', href='/bootstrap/css/bootstrap.min.css')
+		// link(rel='stylesheet prefetch', href='/materialize/css/materialize.min.css')
+		link(href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet")
+		script(src='/jquery/jquery-3.3.1.min.js')
+		script(src='/jquery/jquery.tablesorter.min.js')
+		script(src='/bootstrap/js/bootstrap.min.js')
+		// script(src='/materialize/js/materialize.min.js')
+		script.
+			function goBack() {
+				window.history.back();
+			}
+	body
+		header
+			nav#nav.navbar
+				.container
+					.navbar-header
+						.navbar-brand
+							a(href='http://localhost:4000/competition/')
+								p INATEL
+		block content
+	rodape
+		.rodape
+			.container
+				.row.return
+					.col-md-2
+						i.large.material-icons(onclick="goBack()") keyboard_return
+		block addItem

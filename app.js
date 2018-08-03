@@ -7,8 +7,35 @@ var logger = require('morgan');
 // Connect
 var mongoose = require('mongoose');
 
-var app = express();
 
+var multer = require('multer'); //
+var session = require('cookie-session'); //
+var bCrypt = require('bcrypt-nodejs');
+var passport = require('passport');
+var Strategy = require('passport-local').Strategy;
+
+var createHash = function(conteudo){
+  return bCrypt.hashSync(conteudo, bCrypt.genSaltSync(10), null);
+}
+
+// Nodejs encryption with CTR
+var crypto = require('crypto'),
+    algorithm = 'aes-256-ctr',
+    password = '\d{s8:#@i%rct|y';
+
+function encrypt(text){
+  var cipher = crypto.createCipher(algorithm,password)
+  var crypted = cipher.update(text,'utf8','hex')
+  crypted += cipher.final('hex');
+  return crypted;
+}
+ 
+function decrypt(text){
+  var decipher = crypto.createDecipher(algorithm,password)
+  var dec = decipher.update(text,'hex','utf8')
+  dec += decipher.final('utf8');
+  return dec;
+}
 // Connect to Database
 mongoose.connect('mongodb://onlinejudge:teste123@ds263759.mlab.com:63759/onlinejudgeinatel', function(err){
   if(err) {
@@ -16,16 +43,73 @@ mongoose.connect('mongodb://onlinejudge:teste123@ds263759.mlab.com:63759/onlinej
   }
 });
 
+passport.use(new Strategy(
+  function(username, password, cb) {
+
+   var Usuarios = app.models.users;
+
+    Usuarios.findOne({email: username}, function(err, user){
+        if (err) { return cb(err); }
+        if (!user) { return cb(null, false); }
+        if (!isValidPassword(user, password)) { return cb(null, false); }
+
+        //mongoose.connect(decrypt(user.database));
+
+        //console.log("Meu BD: "+ conn2.host)
+
+        return cb(null, user);
+    });
+}));
+
+var isValidPassword = function(user, password){
+  return bCrypt.compareSync(password, user.senha);
+}
+
+passport.serializeUser(function(user, cb) {
+  cb(null, user._id);
+});
+
+passport.deserializeUser(function(id, cb) {
+  var Usuarios = app.models.users;
+
+  Usuarios.findById(id, function(err, user){
+    if (err) { return cb(err); }
+    cb(null, user);
+    return console.log(user);
+  });
+});
+
+var app = express();
+
+// Use the session middleware
+app.use(session({ secret: '#$%¨&*()ko', cookie: { maxAge: 60000 }}))  // secret: keyboard cat
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+
+var allowCrossDomain = function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+}
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(allowCrossDomain);
+app.use(require('express-session')({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
+
+global.id_competidorGlobal = "id_competidor";  
 // app.use(express.static(__dirname, 'uploads'));
+
+// Initialize Passport and restore authentication state, if any, from the
+// session.
+app.use(passport.initialize());
+app.use(passport.session());
 
 // catch 404 and forward to error handler
 // app.use(function(req, res, next) {
@@ -53,6 +137,23 @@ load('models')
   .then('controllers')
   .then('routes')
   .into(app);
+
+app.get('/login',
+function(req, res){
+  res.render('login');
+});
+
+app.post('/login',
+passport.authenticate('local', { failureRedirect: '/login' }),
+function(req, res) {
+  res.redirect('/competition');
+});
+
+app.get('/logout',
+function(req, res){
+  req.logout();
+  res.redirect('/login');
+});
 
 app.listen(4000, function(){
   console.log('Rodando...');

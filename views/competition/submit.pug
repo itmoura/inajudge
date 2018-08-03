@@ -1,25 +1,40 @@
 extends ../layout
 
 block content
-    h1 Problema #{title} - #{problema.letra}
-    p Descrição
-    h4 #{problema.descricao}
-    p Entrada
-    h4 #{problema.txt_entrada}
-    p Saída
-    h4 #{problema.txt_saida}
-    p Exemplo de Entrada
-    h4 #{problema.exp_entrada}
-    p Exemplo de saída
-    h4 #{problema.exp_saida}
-    
     .container
         .row
-            .col-md-4
+            h1 Problema #{title} - #{problema.letra}
+            .col-md-2.pull-right
+                div.topo.topo2
+                    i.large.material-icons.face face
+            .col-md-10
+                p Descrição
+                .fundinho
+                    h4 #{problema.descricao}
+            .col-md-10
+                p Entrada
+                .fundinho
+                    h4 #{problema.txt_entrada}
+            .col-md-10
+                p Saída
+                .fundinho
+                    h4 #{problema.txt_saida}
+            .col-md-10
+                p Exemplo de Entrada
+                .fundinho
+                    h4 #{problema.exp_entrada}
+            .col-md-10
+                p Exemplo de saída
+                .fundinho
+                    h4 #{problema.exp_saida}
+           
+            .col-md-10
+                p Enviar arquivo
                 form.form-group(action='/submit/code', method='post', enctype="multipart/form-data")
                     input.form-control(type='hidden', name='id_problem', value=""+problema._id, required)
                     input.form-control(type='hidden', name='name_problem', value=""+problema.nome, required)
                     input.form-control(type='hidden', name='id_contest', value=""+problema.id_competition, required)
                     input#arquivoInput.form-control(type='file', name='problem', required)
-                    button.btn.btn-primary.col-md-2(type="submit") Enviar
+                    br
+                    button.btn.btn-primary.col-md-12(type="submit") Enviar
     block addItem

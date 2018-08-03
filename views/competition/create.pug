@@ -1,20 +1,19 @@
 extends ../layout
 
 block content
-	h1= title
-	p #{title}
 	.container
-		form.form-group(action='/create_room', method='post')
-			.row
-				container.col-md-4
-					input.form-control(type='text', name='title', placeholder="Título", required)
-					input.form-control(id="datetime", type="datetime-local", name='data_inicio' placeholder="Data", required)
-					input.form-control(id="datetime", type="datetime-local", name='data_fim' placeholder="Data", required)
-					textarea.form-control(type='text', name='description', placeholder="Descrição" cols="30", rows="10", required)
-					input.form-control(type='text', name='senha', placeholder="Senha")
-			button.btn.btn-primary.col-md-2(type="submit") Enviar
-	br
-	br
+		.row(style="margin-bottom: 15px;")
+			h1= title
+		.row
+			form.form-group.create_competition(action='/create_room', method='post')
+				input.form-control(type='text', name='title', placeholder="Título", required)
+				input.form-control(id="datetime", type="datetime-local", name='data_inicio' placeholder="Data", required)
+				input.form-control(id="datetime", type="datetime-local", name='data_fim' placeholder="Data", required)
+				textarea.form-control(type='text', name='description', placeholder="Descrição" cols="30", rows="10", required)
+				input.form-control(type='text', name='senha', placeholder="Senha")
+				button.btn.btn-primary.col-md-12(type="submit") Enviar
+		br
+		br
 block addItem
 	//- script.
 	//- 	$(document).ready(function() {

@@ -27,13 +27,13 @@ module.exports = function(app){
 	var competition = app.controllers.competition; // pega da pasta controllers, o controllers esta setado em load
     
     // Tela com todas as competições
-    app.get('/competition', competition.index); 
+    app.get('/competition', require('connect-ensure-login').ensureLoggedIn(), competition.index); 
     // Criação de competição
-	app.get('/competition/create', competition.create);
+	app.get('/competition/create', require('connect-ensure-login').ensureLoggedIn(), competition.create);
 
-	app.get('/competition/room/:id', competition.room);
+	app.get('/competition/room/:id', require('connect-ensure-login').ensureLoggedIn(), competition.room);
 
-	app.get('/competition/room/:id/submit/:id', competition.submit);
+	app.get('/competition/room/:id/submit/:id', require('connect-ensure-login').ensureLoggedIn(), competition.submit);
 
     // Criando sala da competição
 	app.post('/create_room', competition.create_room);
@@ -44,4 +44,7 @@ module.exports = function(app){
 
 	// upload submit code
 	app.post('/submit/code', upload_submit.single('problem'), competition.submitProblem);
+
+	// Atualizando data
+	app.get('/atualizaData', require('connect-ensure-login').ensureLoggedIn(), competition.atualizaData);
 };

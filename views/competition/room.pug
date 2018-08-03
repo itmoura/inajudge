@@ -3,24 +3,204 @@ extends ../layout
 block content
     .container
         .row
-            .col-md-8
+            .col-md-8.floatLeft
                 h1= listaCompetiton.titulo
-                p Welcome to #{listaCompetiton.titulo}
             //- se user.autor == user logado
             //- Modal
-            .col-md-3
-                .pull-right
-                    button.btn.btn-primary(type="submit" data-toggle="modal" data-target='#addProblem') + Problema
-            
+            if(id_competidorGlobal == listaCompetiton.autor)
+                .col-md-4.floatRight
+                    .pull-right
+                        button.btn.btn-primary(type="submit" data-toggle="modal" data-target='#addProblem') + Problema
     .container
         .row
-            each lista, i in listProblems 
-                .col-md-3
-                    a.card(href=listaCompetiton._id+'/submit/'+lista._id)
-                        p #{lista.nome} 
-                            span #{lista.letra}
-                        p icone de balão
-    
+            nav.navSubmenu
+                #nav-tab.nav.nav-tabs.col-md-10.floatLeft(role='tablist')
+                    a#nav-home-tab.nav-item.nav-link.active(data-toggle='tab', href='#nav-problema', role='tab', aria-controls='nav-problema', aria-selected='true') Problemas
+                    a#nav-profile-tab.nav-item.nav-link(data-toggle='tab', href='#nav-placar', role='tab', aria-controls='nav-placar', aria-selected='false') Placar
+                    a#nav-contact-tab.nav-item.nav-link(data-toggle='tab', href='#nav-submissoes', role='tab', aria-controls='nav-submissoes', aria-selected='false') Submissões
+                    a#nav-contact-tab.nav-item.nav-link(data-toggle='tab', href='#nav-esclarecimento', role='tab', aria-controls='nav-esclarecimento', aria-selected='false') Esclarecimento
+                .timeRestante.col-md-2.floatLeft#teste
+                    p tempo
+    #nav-tabContent.tab-content
+        #nav-problema.tab-pane.fade.show.active(role='tabpanel', aria-labelledby='nav-problema-tab')
+            .container
+                .row
+                    .col-md-9.floatLeft
+                        each lista, i in listProblems
+                            .col-md-3.floatLeft.borderSuccess(class=''+lista._id)
+                                a.card(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
+                                    - if(submitProblem == 0) {
+                                        div.topo
+                                            i.large.material-icons.face(style="color: black;") face
+                                        p(style="color: black;") #{lista.nome} - #{lista.letra}
+                                    - } else {
+                                        - var achei = 0;
+                                        each submits, i in submitProblem                         
+                                            - var resposta = string(submits.resposta).parseCSV(",").toString();
+                                            - var cont0 = string(resposta).count(0);
+                                            - var cont1 = string(resposta).count(1);
+                                            - if(cont1 >= 1 && submits._id == lista._id) {
+                                                - achei = 1;
+                                                div.topo
+                                                    i.large.material-icons.face(style="color: green;") face
+                                                p(style="color: green;") #{lista.nome} - #{lista.letra}
+                                            - } else if (cont0 >= 1 && submits._id == lista._id) {
+                                                - achei = 1;
+                                                div.topo
+                                                    i.large.material-icons.face(style="color: red;") face
+                                                p(style="color: red;") #{lista.nome} - #{lista.letra}
+                                            - }
+                                        if(achei == 0)
+                                            div.topo
+                                                i.large.material-icons.face(style="color: black;") face
+                                            p(style="color: black;") #{lista.nome} - #{lista.letra}
+                                    - }
+                                            
+
+                    .col-md-3.floatLeft
+                        form.form-group.sendProblem(action='/submit/code', method='post', enctype="multipart/form-data")
+                            input(value=listaCompetiton._id, name="id_room", type="hidden")
+                            input(value="id_competidor", name="id_competidor", type="hidden")
+                            select#language.form-control(name="language")
+                                option(value=" ") Selecione a linguagem 
+                                option(value="C") C
+                                option(value="C++") C+
+                            select#problem.form-control(name="id_problem")
+                                option(value=" ") Selecione o problema
+                                each lista, i in listProblems
+                                    option(value=lista._id) #{lista.letra}
+                            input.form-control(type="file", name="problem")
+                            button.btn.btn-primary(type='submit') Enviar
+        //- FIM TAB 1
+        //- -----------------------------------------------------------------
+        //- INICIO TAB 2
+        #nav-placar.tab-pane.fade(role='tabpanel', aria-labelledby='nav-placar-tab')
+            .container
+                .row
+                    //- TABLE
+                    table.table
+                        thead.thead-light
+                            tr
+                                th(scope='col') Rank
+                                th(scope='col') Nome
+                                each lista, i in listProblems
+                                    th(scope='col') #{lista.letra}
+                                th(scope='col') Total
+                                th(scope='col') Time
+                        tbody
+                             each competidor, i in rank     
+                                tr
+                                    th(scope='row') #{i + 1}
+                                    td #{competidor.id_competidor[0]} 
+                                    //- nome
+                                    -var tempoAcumulado = 0
+                                    -var acertos = 0
+                                    -var submissionsCount = competidor.count;
+                                    each problem, j in listProblems                
+                                        -var problemId = problem._id
+                                        -var acertou = false
+                                        -for(var i=0; i<submissionsCount; i++){
+                                            -var subProblemId = competidor.id_problem[i];
+                                            -if(subProblemId == problemId && competidor.resposta[i] == '1'){
+                                                td #{competidor.letra_problem[i]}
+                                                -acertou = true
+                                                -acertos++;
+                                                -tempoAcumulado += (continha)
+                                                -break;
+                                            -}
+                                        -}
+                                        -if(acertou == false){
+                                            td 
+                                        -}
+                                    td #{acertos}
+                                    td 123
+                                            //- if(cont1 == 0 && achei != 1)
+                                               //-     each submits, i in listProblems                    
+                                            //-         - var resposta = string(listaRank.resposta[j]).parseCSV(",").toString();
+                                            //-         - var cont0 = string(resposta).count(0);
+                                            //-         - var cont1 = string(resposta).count(1);
+                                            //-         - if(cont1 >= 1 && submits._id == listaRank.id_problem[j]) {
+                                            //-             - var teste = string(elim).parseCSV(",").toString();
+                                            //-             - var tam = string(teste).count(submits.letra);
+                                            //-             if(tam == 0)
+                                            //-                 - achei = 1;
+                                            //-                 - elim += submits.letra + ',';
+                                            //-                 td #{submits.letra} Aceito
+                                            //-         - }
+                                    //- - }
+                                    //- p #{elim}
+                                        //- - var cont0 = string(resposta).count(0);
+                                        //- - var cont1 = string(resposta).count(1);
+                                        //- - if(cont1 >= 1 && submits._id == listaRank.id_problem[i]) {
+                                        //-     - achei = 1;
+                                        //-     td #{submits._id} Aceito
+                                        //- - } else if (cont0 >= 1 && submits._id == listaRank.id_problem[i]) {
+                                        //-     - achei = 1;
+                                        //-     td #{submits._id} Erro
+                                        //- - }
+                                        //- - i++;
+                                    //- if(achei == 0)
+                                    //-     td _
+                                    //- each lista, i in listProblems 
+                                    //-     - var achei = 0;
+                                    //-     - var i = 0;
+                                    //-     - while(i < listaRank.count){    
+                                    //-         p #{lista._id} == #{listaRank.id_problem[i]} ||
+                                    //-         - var resposta = listaRank.resposta[i];
+                                    //-         - if(lista._id == listaRank.id_problem[i]) {
+                                    //-             - if(resposta == 1) {
+                                    //-                 - achei = 1;
+                                    //-                 td #{lista.letra} Aceito
+                                    //-             - } else if (resposta == 0 ) {
+                                    //-                 - achei = 1;
+                                    //-                 td #{lista.letra} Erro
+                                    //-             - }
+                                    //-         - }
+                                    //-         - i ++;
+                                    //-     - }                                   
+                                    //- td a
+                                    //- td b
+                                    //- - var i = 0
+                                    //- each lista, i in submitOk
+                                        while(i < lista.count)
+
+                                        if(lista.resposta == 1)
+                                            td Aceito
+                                    //- td #{submitOk.count}
+                                    //- td #{submitOk.hora_atual}
+        //- FIM TAB 2
+        //- -----------------------------------------------------------------
+        //- INICIO TAB 3
+        #nav-submissoes.tab-pane.fade(role='tabpanel', aria-labelledby='nav-submissoes-tab')
+            .container
+                .row
+                    //- TABLE
+                    table.table
+                        thead.thead-light
+                            tr
+                            th(scope='col') ID
+                            th(scope='col') Problema
+                            th(scope='col') Resposta
+                            th(scope='col') Tempo
+                        tbody
+                            each listaS, i in listaSubmit
+                                tr
+                                    th(scope='row') #{listaS._id}
+                                    each lista, i in listProblems
+                                        if(lista._id == listaS.id_problem)
+                                            td #{lista.letra}
+                                    td #{listaS.resposta}
+                                    td #{listaS.hora_atual}
+        //- FIM TAB 3
+        //- -----------------------------------------------------------------
+        //- INICIO TAB 3
+        #nav-esclarecimento.tab-pane.fade(role='tabpanel', aria-labelledby='nav-esclarecimento-tab')
+            .container
+                .row
+                    p TAB esclarecimento
+        //- FIM TAB 3
+        //- -----------------------------------------------------------------
+        
     .modal.fade(tabindex='-1', role='dialog', aria-labelledby='myLargeModalLabel', aria-hidden='true', id='addProblem')
         .modal-dialog.modal-lg(role='document')
             .modal-content
@@ -53,5 +233,21 @@ block content
                         button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
                         button.btn.btn-primary(type='submit') Finzalizar
     block addItem
-            
-                                    
+    script.
+        //- var Requisitar = function(){
+        //- $.getJSON('http://localhost:4000/atualizaData', function(data) {
+        //-     var texto = JSON.stringify(data);
+        //-     console.log(texto);
+        //-     $('#teste').html(texto);
+        //-     setTimeout(function(){ Requisitar(); },1000);//1000=a um segundo, altere conforme o necessario
+        //- });
+        //- };
+
+        //- Requisitar();
+        //- setTimeout(function(){ 
+        //-     //- $.getJSON('http://localhost:4000/atualizaData', function(json) {
+        //-         //- var texto = JSON.stringify(json);
+        //-         //- console.log(texto);
+        //-         $('#teste').append('teste');
+        //-     //- });
+        //- }, 1000);

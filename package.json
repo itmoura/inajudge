@@ -6,12 +6,17 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "aggregate": "^0.1.0",
+    "bcrypt-nodejs": "*",
     "body-parser": "*",
     "child_process": "^1.0.2",
+    "connect-ensure-login": "*",
     "cookie-parser": "~1.4.3",
+    "cookie-session": "*",
     "debug": "~2.6.9",
     "express": "~4.16.0",
     "express-load": "*",
+    "express-session": "*",
     "file-system": "*",
     "gcc": "^1.0.2",
     "http-errors": "~1.6.2",
@@ -23,6 +28,8 @@
     "nexe": "^2.0.0-rc.28",
     "node-cmd": "*",
     "node-run-cmd": "^1.0.1",
+    "passport": "~0.2.0",
+    "passport-local": "~1.0.0",
     "pug": "2.0.0-beta11",
     "string": "*",
     "unzip": "*"

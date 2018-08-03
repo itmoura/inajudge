@@ -1,5 +1,4 @@
 body {
-	padding: 50px;
   	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -7,11 +6,44 @@ a {
   	color: #00B7FF;
 }
 
+/* DEFAULTS */
+	.floatLeft {float: left;}
+	.floatRight {float: right;}
+
+	.borderSuccess {border-color: green;}
+	
+/* -------- */
+
+nav {background-color: cornflowerblue; margin-bottom: 15px; padding-top: 10px;}
+nav .container a {color: #ffffff;}
+
+/* RODAPE */
+.rodape {margin-top: 15px;}
+.rodape .return {right: 80px; bottom: 20px; position: absolute;}
+.rodape .return:hover {cursor: pointer;}
+
 #arquivoInput.form-control {width: auto;}
 #addItem {margin-bottom: 10px;}
 .input_fields_wrap {margin-top: 15px;}
 .remove_field {color: red; margin-top: 15px; margin-left: 5px;}
 
 /* COMPETIÇÃO */
+	/* SubMenu */
+		.navSubmenu {background-color: transparent; margin-top: 35px; width: 100%;}
+		.navSubmenu .active {color: cornflowerblue !important; background-color: transparent !important; border-color: transparent !important;}
+		.navSubmenu a {color: slategray;}
+		.nav-tabs .nav-link:focus, .nav-tabs .nav-link:hover {border-color: transparent !important;}
+		.navSubmenu a:hover {color: cornflowerblue !important;}
+	/* criação */
+		.create_competition input {margin-bottom: 8px;}
+		.create_competition textarea {margin-bottom: 8px;}
   	/* Index */
 		.card {border: 2px solid #00B7FF; border-radius: 20px; padding: 20px;}
+	/* SALA */
+		.sendProblem select {margin-bottom: 10px;}
+		.sendProblem button {margin-top: 10px; float: right;}
+		.topo {position: relative; float: right; text-align: right}
+		.face {color: tomato;}
+	/* PROBLEMA */
+		.topo2 {margin-top: 15px;}
+		.fundinho {background-color: lightslategrey; width: 100%; min-height: 80px; border-radius: 10px; color: #fff; padding-left: 10px;}

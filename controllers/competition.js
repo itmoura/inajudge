@@ -3,6 +3,7 @@ var unzip = require('unzip');
 var moment = require('moment');
 var S = require('string');
 
+
 module.exports = function(app) {
 
 	var Contest = app.models.contests;
@@ -36,6 +37,7 @@ module.exports = function(app) {
 			});
 		},
 		room: function(req,res) {
+			console.log(id_competidorGlobal);
 			Contest.findById(req.params.id, function(err, data){
 				if (err) {
 					console.log('Deu erro em room'+err);
@@ -45,11 +47,100 @@ module.exports = function(app) {
 						if (err) {
 							console.log('Deu erro em room'+err);
 						}
-						res.render('competition/room', {title: data.titulo, listaCompetiton: data, listProblems: data2});
+						Submit.find({'id_competidor': id_competidorGlobal, 'id_room': data._id}).sort( {'_id': -1} ).exec(function(err, dataSubmit){
+							if (err) {
+								console.log('Deu erro em room'+err);
+							} 
+							Submit.aggregate([
+								{ $match: { id_competidor: id_competidorGlobal  } },
+								{ $group : 
+									{ 
+										_id : "$id_problem", 
+										resposta: { 
+											$push: "$resposta"
+										}, 
+										id_competidor: {
+											$push: "$id_competidor"
+										},
+										id_room: {
+											$push: "$id_room"
+										},
+										id_problem: {
+											$push: "$id_problem"
+										},
+										filename: {
+											$push: "$filename"
+										},
+										hora_atual: {
+											$push: "$hora_atual"
+										},
+										data_atual: {
+											$push: "$data_atual"
+										},
+										count: { 
+											$sum: 1 
+										}
+									}
+								}
+							  ]).exec(function(err, submitProblem){
+								if (err) {
+									console.log('Deu erro em room'+err);
+								}
+								if (submitProblem == null) {
+									submitProblem = 0;
+								}
+								Submit.aggregate([
+									{ $group : 
+										{ 
+											_id : "$id_competidor",
+											resposta: { 
+												$push: "$resposta"												
+											}, 
+											id_competidor: {
+												$push: "$id_competidor"
+											},
+											id_room: {
+												$push: "$id_room"
+											},
+											id_problem: {
+												$push: "$id_problem"
+											},
+											filename: {
+												$push: "$filename"
+											},
+											hora_atual: {
+												$push: "$hora_atual"
+											},
+											data_atual: {
+												$push: "$data_atual"
+											},
+											letra_problem: {
+												$push: "$letra_problem"
+											},
+											count: { 
+												$sum: 1 
+											}
+										}
+									},
+									{ $sort : { count : -1 } }
+									// { $sort : { "letra_problem" : 1 } }
+								  ]).exec(function(err, rank){
+									if (err) {
+										console.log('Deu erro em room'+err);
+									}
+									console.log(rank);
+									 console.log(data2);
+									res.render('competition/room', {title: data.titulo, listaCompetiton: data, listProblems: data2, listaSubmit: dataSubmit, submitProblem: submitProblem, string: S, rank: rank});
+								});
+							});
+						});
 					});
 				}
 					
 			});			
+		},
+		atualizaData: function(req,res,callback){
+			var data_atual = moment().format();
 		},
 		submit: function(req,res) {
 			Problem.findById(req.params.id, function(err, data){
@@ -59,7 +150,6 @@ module.exports = function(app) {
 				else {
 					res.render('competition/submit', {title: data.nome, problema: data});
 				}
-					
 			});			
 	  	},
 		create: function(req,res) {
@@ -67,80 +157,46 @@ module.exports = function(app) {
 		},
 		submitProblem: function(req, res, next){
 			var filename = req.file.filename;
+			var id_room = req.body.id_room;
 			var id_problem = req.body.id_problem;
-			var id_contest = req.body.id_contest;
-			var name_problem = req.body.name_problem;
+			var id_competidor = req.body.id_competidor;
 			var model = new Submit;
-			model.autor = "@itmoura";
+			model.id_competidor = id_competidor;
+			model.id_room = id_room;
 			model.id_problem = id_problem;
-			model.id_contest = id_contest;
 			model.data_atual = moment().format('DD/MM/YYYY');
 			model.hora_atual = moment().format('LT'); 
 			model.filename = filename;
-			model.save(function(err){
+			Problem.findOne({ _id: id_problem }, function(err, getLetra){
 				if (err) {
-					console.log(err);
-					res.write('<script>alert("Falha ao cadastrar!"); window.location="../"</script>');
+					console.log('Deu erro em room'+err);
 				}
-				else {
-					/* COMPARAÇÃO DE RESULTADO */
-					// const exec = require('child_process').exec;
-					const fs = require('fs');
-					var cmd = require('node-cmd');				
-					
-					function criando_executavel() {
-						cmd.run('g++ ./public/resolutions/'+filename+' -o '+filename+'.exe');
+				console.log(getLetra.letra);
+				model.letra_problem = getLetra.letra;
+				model.save(function(err){
+					if (err) {
+						console.log(err);
+						res.write('<script>alert("Falha ao enviar!"); window.location="../"</script>');
 					}
-					
-					function gerando_saida() {
-						var S = require('string');
-						fs.readFile('./public/contest/5b0f13953b3a602398f2350a/in_teste2.txt', 'utf-8', function (err, data) {
-							var n = 0;
-							var teste = S(data).splitLeft(';');
-							while(n < 2){
-								console.log(teste[n]);
-								fs.writeFile('./public/resolutions/teste'+n+'.txt', teste[n], (err) => {  
-									// throws an error, you could also catch it here
-									if (err) throw err;
-								
-									// success case, the file was saved
-									console.log('Lyric saved!');
+					else {
+						Problem.findOne().sort({'_id': -1}).exec(function(err, data){
+							if (err) {
+								console.log('Deu erro em room '+err);
+							} 
+							else {
+								model.resposta = Math.floor(Math.random() * (1 - 0 + 1) + 0);
+								model.save(function(err){
+									if (err) {
+										console.log(err);
+										res.write('<script>alert("Falha ao enviar!"); window.location="../"</script>');
+									} else {
+										res.redirect('http://localhost:4000/competition/room/'+id_room);
+									}
 								});
-								// cmd.run(teste[n]+'> ./public/resolutions/teste'+n+'.txt')
-								// cmd.run(filename+'.exe < '+teste[n]+' > ./public/resolutions/'+filename+'.txt');
-								n++;
 							}
-						});
+						});	
 					}
-					
-					function excluindo_executavel() {
-						fs.unlinkSync(filename+'.exe');
-					}
-					function comparando_resultado(){
-						fs.readFile('./public/resolutions/'+filename+'.txt', 'utf-8', function (err, data) {
-							// if(err) throw err;
-							
-							fs.readFile('./public/contest/5b0f13953b3a602398f2350a/out_teste1.txt', 'utf-8', function (err2, data2) {
-								// if(err2) throw err2;
-								
-								console.log(data);
-								console.log(data2);
-								if(data2 == data)
-									console.log("codigo Aceito");
-								else
-									console.log("codigo nao aceito");
-							});
-						});
-					}
-					criando_executavel();
-					// Esperando 2 segundos
-					setTimeout(gerando_saida, 3000);
-					// Esperando 3 segundos
-					setTimeout(comparando_resultado, 5000);
-					// Esperando 5 segundos
-					setTimeout(excluindo_executavel, 8000);
-					res.redirect('/competition/');
-				}
+				});
 	  		});
 		},
 		create_room: function(req, res){
@@ -151,7 +207,12 @@ module.exports = function(app) {
 			model.data_fim = req.body.data_fim;
 			model.titulo = req.body.title;
 			model.descricao = req.body.description;
-			console.log(req.body.titulo);
+			console.log(req.body.title);
+			// var i = 0;
+			// while(i < 10000000000){
+			// 	i++;
+			// }
+			// console.log("saiu");
 			model.save(function(err){
 				if (err) {
 					console.log(err);
@@ -262,4 +323,66 @@ upload: function(req, res, next){
 }
 
 
-*/
+*/ 
+
+
+/* ------------------------- */
+
+/* COMPARAÇÃO DE RESULTADO */
+// const exec = require('child_process').exec;
+// const fs = require('fs');
+// var cmd = require('node-cmd');				
+
+// function criando_executavel() {
+// 	cmd.run('g++ ./public/resolutions/'+filename+' -o '+filename+'.exe');
+// }
+
+// function gerando_saida() {
+// 	var S = require('string');
+// 	fs.readFile('./public/contest/5b0f13953b3a602398f2350a/in_teste2.txt', 'utf-8', function (err, data) {
+// 		var n = 0;
+// 		var teste = S(data).splitLeft(';');
+// 		while(n < 2){
+// 			console.log(teste[n]);
+// 			fs.writeFile('./public/resolutions/teste'+n+'.txt', teste[n], (err) => {  
+// 				// throws an error, you could also catch it here
+// 				if (err) throw err;
+			
+// 				// success case, the file was saved
+// 				console.log('Lyric saved!');
+// 			});
+// 			// cmd.run(teste[n]+'> ./public/resolutions/teste'+n+'.txt')
+// 			// cmd.run(filename+'.exe < '+teste[n]+' > ./public/resolutions/'+filename+'.txt');
+// 			n++;
+// 		}
+// 	});
+// }
+
+// function excluindo_executavel() {
+// 	fs.unlinkSync(filename+'.exe');
+// }
+// function comparando_resultado(){
+// 	fs.readFile('./public/resolutions/'+filename+'.txt', 'utf-8', function (err, data) {
+// 		// if(err) throw err;
+		
+// 		fs.readFile('./public/contest/5b0f13953b3a602398f2350a/out_teste1.txt', 'utf-8', function (err2, data2) {
+// 			// if(err2) throw err2;
+			
+// 			console.log(data);
+// 			console.log(data2);
+// 			if(data2 == data)
+// 				console.log("codigo Aceito");
+// 			else
+// 				console.log("codigo nao aceito");
+// 		});
+// 	});
+// }
+// criando_executavel();
+// // Esperando 2 segundos
+// setTimeout(gerando_saida, 3000);
+// // Esperando 3 segundos
+// setTimeout(comparando_resultado, 5000);
+// // Esperando 5 segundos
+// setTimeout(excluindo_executavel, 8000);
+// res.redirect('/competition/');
+/*  ----------------- */
