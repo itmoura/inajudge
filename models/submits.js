@@ -5,11 +5,13 @@ module.exports = function(){
 
 	var submits = new Schema({
         id_competidor: String,
+        nome_competidor: String,
         id_room: String,
         id_problem: String,
         letra_problem: String,
         data_atual: String,
         hora_atual: String,
+        hora_data: String,
         filename: String,
         resposta: String
 	});

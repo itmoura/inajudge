@@ -4,7 +4,9 @@ module.exports = function(){
 	var Schema = mongoose.Schema;
 
 	var contests = new Schema({
-		autor: String,
+		id_autor: String,
+		liberado: Boolean,
+		nome_autor: String,
 		senha: String,
 		titulo: String,
 		data_inicio: String,

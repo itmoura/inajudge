@@ -4,73 +4,148 @@ block content
     .container
         .row
             .col-md-8.floatLeft
-                h1= listaCompetiton.titulo
+                h1= listaCompetiton.titulo + " "
+                    if(user._id == listaCompetiton.id_autor)
+                        button.btn.btn-warning(data-toggle="modal" data-target='#edtCompeticao') Editar
+                        button.btn.btn-danger(data-toggle="modal", data-target='#deleteCompeticao', style="margin-left: 10px;") Deletar
+                        if(listaCompetiton.liberado == false)
+                            a.btn.btn-success(href="/atualizar_competicao/"+listaCompetiton._id,  style="margin-left: 10px; color: #fff;") Iniciar Competição
+                        else
+                            a.btn.btn-danger(href="/atualizar_competicao/"+listaCompetiton._id, style="margin-left: 10px; color: #fff;") Parar Competição
             //- se user.autor == user logado
             //- Modal
-            if(id_competidorGlobal == listaCompetiton.autor)
+            if(user._id == listaCompetiton.id_autor)
                 .col-md-4.floatRight
                     .pull-right
-                        button.btn.btn-primary(type="submit" data-toggle="modal" data-target='#addProblem') + Problema
+                        button.btn.btn-secondary(type="submit" data-toggle="modal" data-target='#addProblem') + Problema
     .container
         .row
             nav.navSubmenu
-                #nav-tab.nav.nav-tabs.col-md-10.floatLeft(role='tablist')
-                    a#nav-home-tab.nav-item.nav-link.active(data-toggle='tab', href='#nav-problema', role='tab', aria-controls='nav-problema', aria-selected='true') Problemas
-                    a#nav-profile-tab.nav-item.nav-link(data-toggle='tab', href='#nav-placar', role='tab', aria-controls='nav-placar', aria-selected='false') Placar
-                    a#nav-contact-tab.nav-item.nav-link(data-toggle='tab', href='#nav-submissoes', role='tab', aria-controls='nav-submissoes', aria-selected='false') Submissões
-                    a#nav-contact-tab.nav-item.nav-link(data-toggle='tab', href='#nav-esclarecimento', role='tab', aria-controls='nav-esclarecimento', aria-selected='false') Esclarecimento
-                .timeRestante.col-md-2.floatLeft#teste
-                    p tempo
+                #myTab.nav.nav-tabs.col-md-9.floatLeft(role='tablist')
+                    a#nav-home-tab.nav-item.nav-link.active(data-toggle='tab', href='#nav-problema', role='tab', data-target='#nav-problema', aria-target='nav-problema', aria-selected='true') Problemas
+                    a#nav-profile-tab.nav-item.nav-link(data-toggle='tab', href='#nav-placar', role='tab', data-target='#nav-placar', aria-target='nav-placar', aria-selected='false') Placar
+                    a#nav-contact-tab.nav-item.nav-link(data-toggle='tab', href='#nav-submissoes', role='tab', data-target='#nav-submissoes', aria-target='nav-submissoes', aria-selected='false') Submissões
+                    a#nav-contact-tab.nav-item.nav-link(data-toggle='tab', href='#nav-esclarecimento', role='tab', data-target='#nav-esclarecimento', aria-target='nav-esclarecimento', aria-selected='false') Esclarecimento
+                .timeRestante.col-md-3.floatLeft#testeCerto
+                    - if(moment().format() < moment(listaCompetiton.data_fim).format()){
+                        input.form-control.col-md-12.data_fim(type='hidden', name='data_fim', value=listaCompetiton.data_fim)
+                        input.form-control.col-md-12.data_inicio(type='hidden', name='data_inicio', value=listaCompetiton.data_inicio)
+                        #data_reduzindo 
+                            p #{moment().format('LTS')}
+                        script.
+                            var data_fim = $('.data_fim').val();
+                            var hora_quebrada = data_fim.split('T')[1];
+                            var hora_quebrada = hora_quebrada.split(':');
+                            var quebra_data = data_fim.split('-')[2];
+                            var quebra_data = quebra_data.split('T')[0];
+
+                            $(document).ready(function(){ 
+                                loop();                        
+                            });                        
+                            var loop = function(){
+                                var data_atual = moment().format();
+                                var hora_quebrada_atual = data_atual.split('T')[1];
+                                var hora_quebrada_atual = hora_quebrada_atual.split(':');
+                                var quebra_data_atual = data_atual.split('-')[2];
+                                var quebra_data_atual = quebra_data_atual.split('T')[0];
+                                data_fim = 0;
+                                data_atual = 0;
+                                //- var data_fim = data_fim;                             
+                                
+                                var dia_sub = (quebra_data*1)*24;
+                                var hours_sub = (hora_quebrada[0])*1 + dia_sub;
+                                var minuto = (hora_quebrada[1])*1;
+
+                                var dia_sub_atual = (quebra_data_atual*1)*24;
+                                var hours_sub_atual = (hora_quebrada_atual[0])*1 + dia_sub_atual;
+                                var minuto_atual = (hora_quebrada_atual[1])*1;
+                                //- -seconds_sub = (envio_sub[17]+envio_sub[18])*1;
+                                data_fim = hours_sub*60 + minuto;     
+                                data_atual = hours_sub_atual*60 + minuto_atual; 
+                                var data_defi = data_fim - data_atual;       
+                                //- console.log(data_fim);                     
+                                
+                                var hoje = moment().format('LTS');
+                                $('#data_reduzindo').html(data_defi+ ' minutos restantes');
+                                setTimeout('loop()', 1000); 	
+                            }
+                    -} else {
+                        p Competição encerrada
+                    - }
+                    
     #nav-tabContent.tab-content
         #nav-problema.tab-pane.fade.show.active(role='tabpanel', aria-labelledby='nav-problema-tab')
             .container
                 .row
                     .col-md-9.floatLeft
                         each lista, i in listProblems
-                            .col-md-3.floatLeft.borderSuccess(class=''+lista._id)
-                                a.card(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
-                                    - if(submitProblem == 0) {
-                                        div.topo
-                                            i.large.material-icons.face(style="color: black;") face
-                                        p(style="color: black;") #{lista.nome} - #{lista.letra}
-                                    - } else {
-                                        - var achei = 0;
-                                        each submits, i in submitProblem                         
-                                            - var resposta = string(submits.resposta).parseCSV(",").toString();
-                                            - var cont0 = string(resposta).count(0);
-                                            - var cont1 = string(resposta).count(1);
-                                            - if(cont1 >= 1 && submits._id == lista._id) {
-                                                - achei = 1;
-                                                div.topo
-                                                    i.large.material-icons.face(style="color: green;") face
-                                                p(style="color: green;") #{lista.nome} - #{lista.letra}
-                                            - } else if (cont0 >= 1 && submits._id == lista._id) {
-                                                - achei = 1;
-                                                div.topo
-                                                    i.large.material-icons.face(style="color: red;") face
-                                                p(style="color: red;") #{lista.nome} - #{lista.letra}
-                                            - }
-                                        if(achei == 0)
-                                            div.topo
-                                                i.large.material-icons.face(style="color: black;") face
-                                            p(style="color: black;") #{lista.nome} - #{lista.letra}
+                            - var saida = false;
+                            each submissoes, j in submitProblem
+                                - var tam = submitProblem[j].count;
+                                -var subProblemId = listProblems[i]._id;
+                                - var achou = false;
+                                -for(var k = 0; k < tam; k++){
+                                    - if(submissoes.id_competidor[k] == user._id){
+                                        - if(subProblemId == submissoes.id_problem[k] && submissoes.resposta[k] == '1'){
+                                            .col-md-3.floatLeft
+                                                a.card.sucesso(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
+                                                    div.topo
+                                                        i.large.material-icons.face face
+                                                    p #{lista.nome} - #{lista.letra}
+                                            - achou = true;
+                                            - saida = true;
+                                            - break;
+                                        - }
+                                        - if(achou == false && subProblemId == submissoes.id_problem[k] && k == tam-1){
+                                            .col-md-3.floatLeft
+                                                a.card.falha(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
+                                                    div.topo
+                                                        i.large.material-icons.face face
+                                                    p #{lista.nome} - #{lista.letra}
+                                            - achou = true;
+                                            - saida = true;
+                                            - break;
+                                        - }                                        
                                     - }
+                                -}
+                            -if(saida == false){
+                                .col-md-3.floatLeft.normal
+                                    a.card(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
+                                        div.topo
+                                            i.large.material-icons.face face
+                                        p #{lista.nome} - #{lista.letra}
+                            -}                                  
+                                //- if(achei == false)
+                                //-     .col-md-3.floatLeft.borderSuccess(class=''+lista._id)
+                                //-         a.card(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
+                                //-             div.topo
+                                //-                 i.large.material-icons.face(style="color: black;") face
+                                //-             p(style="color: black;") #{lista.nome} - false
+                                
                                             
 
                     .col-md-3.floatLeft
-                        form.form-group.sendProblem(action='/submit/code', method='post', enctype="multipart/form-data")
-                            input(value=listaCompetiton._id, name="id_room", type="hidden")
-                            input(value="id_competidor", name="id_competidor", type="hidden")
-                            select#language.form-control(name="language")
-                                option(value=" ") Selecione a linguagem 
-                                option(value="C") C
-                                option(value="C++") C+
-                            select#problem.form-control(name="id_problem")
-                                option(value=" ") Selecione o problema
-                                each lista, i in listProblems
-                                    option(value=lista._id) #{lista.letra}
-                            input.form-control(type="file", name="problem")
-                            button.btn.btn-primary(type='submit') Enviar
+                        - if(moment().format() < moment(listaCompetiton.data_fim).format()){
+                            if(listProblems == null || listaCompetiton.liberado == true)
+                                form.form-group.sendProblem(action='/submit/code', method='post', enctype="multipart/form-data")
+                                    input(value=listaCompetiton._id, name="id_room", type="hidden")
+                                    input(value=user._id, name="id_competidor", type="hidden")
+                                    input(value=user.nome, name="nome_competidor", type="hidden")
+                                    select#language.form-control(name="language", required)
+                                        option(value=" ") Selecione a linguagem 
+                                        option(value="C") C
+                                        option(value="C++") C+
+                                    select#problem.form-control(name="id_problem", required)
+                                        option Selecione o problema
+                                        each lista, i in listProblems
+                                            option(value=lista._id) #{lista.letra}
+                                    input.form-control(type="file", name="problem")
+                                    button.btn.btn-success(type='submit') Enviar
+                            else 
+                                p Espere o inicio da competição
+                        - } else {
+                            p Não é possivel mais realizar envio de códigos, pois essa competição foi encerrada
+                        - }
         //- FIM TAB 1
         //- -----------------------------------------------------------------
         //- INICIO TAB 2
@@ -78,7 +153,7 @@ block content
             .container
                 .row
                     //- TABLE
-                    table.table
+                    table.table#mytable
                         thead.thead-light
                             tr
                                 th(scope='col') Rank
@@ -88,32 +163,72 @@ block content
                                 th(scope='col') Total
                                 th(scope='col') Time
                         tbody
-                             each competidor, i in rank     
+                            -var hora_inicio = moment(listaCompetiton.data_inicio).format();
+                            //- - var minutes200 = moment.duration(listaCompetiton.data_inicio).format("h:mm");
+                            //- - var minutes200 = moment.duration(hora_inicio).format('hh:mm:ss');
+                            //- - var minutes200 = moment(listaCompetiton.data_inicio).duration().asMinutes(); 
+                            //-moment(new Date()).toMinutes();
+                            p #{minutes200}
+                            -var inicio_comp = 0
+                            -var dia_comp = 0
+                            -var hours_comp = 0
+                            -var minutes_comp = 0
+                            -var seconds_comp = 0
+                            //- TRANSFORMA HORAS DE COMPETIÇÃO EM MINUTOS
+                            -inicio_comp = string(hora_inicio).parseCSV(":").toString();
+                            -var quebra_data = string(hora_inicio).parseCSV("-").toString();
+                            -var dia_comp = ((quebra_data[8]+quebra_data[9])*1)*24;
+                            //- -dia_comp = (inicio_comp[11]+inicio_comp[12])*1;
+                            -hours = (inicio_comp[11]+inicio_comp[12])*1 + dia_comp;
+                            -var minute = (inicio_comp[14]+inicio_comp[15])*1;
+                            -inicio_comp = hours*60 + minute;
+                            each competidor, i in rank     
                                 tr
                                     th(scope='row') #{i + 1}
-                                    td #{competidor.id_competidor[0]} 
+                                    td #{competidor.nome_competidor[0]} 
                                     //- nome
                                     -var tempoAcumulado = 0
+                                    -var tempoAcumulado2 = 0
+                                    -var envio_sub = 0
+                                    -var dia_sub = 0
+                                    -var hours_sub = 0
+                                    -var minutes_sub = 0
+                                    -var seconds_sub = 0
                                     -var acertos = 0
                                     -var submissionsCount = competidor.count;
                                     each problem, j in listProblems                
                                         -var problemId = problem._id
                                         -var acertou = false
-                                        -for(var i=0; i<submissionsCount; i++){
+                                        - var penalizacao = 0
+                                        -for(var i=0; i < submissionsCount; i++){
                                             -var subProblemId = competidor.id_problem[i];
                                             -if(subProblemId == problemId && competidor.resposta[i] == '1'){
                                                 td #{competidor.letra_problem[i]}
                                                 -acertou = true
                                                 -acertos++;
-                                                -tempoAcumulado += (continha)
+                                                //- TRANSFORMA HORA DE ENVIO EM MINUTOS
+                                                -envio_sub = string(competidor.hora_data[i]).parseCSV(":").toString();
+                                                -var quebra_data = string(competidor.hora_data[i]).parseCSV("-").toString();
+                                                -dia_sub = ((quebra_data[8]+quebra_data[9])*1)*24;
+                                                -hours_sub = (envio_sub[11]+envio_sub[12])*1 + dia_sub;
+                                                -var minuto = (envio_sub[14]+envio_sub[15])*1;
+                                                //- -seconds_sub = (envio_sub[17]+envio_sub[18])*1;
+                                                -envio_sub = (hours_sub*60) + minuto;
+                                                -tempoAcumulado = tempoAcumulado + (envio_sub - inicio_comp) + penalizacao;
                                                 -break;
+                                            -} 
+                                            -if(subProblemId == problemId && competidor.resposta[i] == '0'){
+                                                -penalizacao = penalizacao + 20;
                                             -}
                                         -}
                                         -if(acertou == false){
                                             td 
                                         -}
-                                    td #{acertos}
-                                    td 123
+                                    if(acertos >= 0)
+                                        td #{acertos}
+                                    else
+                                        td
+                                    td #{tempoAcumulado}
                                             //- if(cont1 == 0 && achei != 1)
                                                //-     each submits, i in listProblems                    
                                             //-         - var resposta = string(listaRank.resposta[j]).parseCSV(",").toString();
@@ -228,21 +343,71 @@ block content
                         textarea.form-control(type='text', name='exp_saida', placeholder="Exemplo de Saída" cols="30", rows="10", required)                                                                            
                         br
                         input.form-control(type="file", name="arquivo")
-                        p criado por @itmoura
+                        p criado por #{user.nome}
                     .modal-footer
                         button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
                         button.btn.btn-primary(type='submit') Finzalizar
+
+    .modal.fade(tabindex='-1', role='dialog', aria-labelledby='myLargeModalLabel', aria-hidden='true', id='edtCompeticao')
+        .modal-dialog(role='document')
+            .modal-content
+                .modal-header
+                    h5#exampleModalLabel.modal-title Editando competição
+                    button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') ×
+                form.form-group(action='/edt_competicao/', method='post')
+                    .modal-body
+                        input(type="hidden", name="id_competition", value=listaCompetiton._id)
+                        input.form-control(type='text', name='titulo', value=listaCompetiton.titulo, style="margin-bottom: 10px;")                       
+                        input.form-control(id="datetime", type="datetime-local", name='data_inicio' value=listaCompetiton.data_inicio, required, style="margin-bottom: 10px;")
+                        input.form-control(id="datetime2", type="datetime-local", name='data_fim' value=listaCompetiton.data_fim, required, style="margin-bottom: 10px;")
+                        textarea.form-control(type='text', name='descricao', cols="30", rows="10", required, style="margin-bottom: 10px;") #{listaCompetiton.descricao}
+                        input.form-control(type='text', name='senha', value=listaCompetiton.senha)
+                    .modal-footer
+                        button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
+                        button.btn.btn-primary(type='submit') Editar
+
+    .modal.fade(tabindex='-1', role='dialog', aria-labelledby='myLargeModalLabel', aria-hidden='true', id='deleteCompeticao')
+        .modal-dialog(role='document')
+            .modal-content
+                .modal-header
+                    h5#exampleModalLabel.modal-title Deletar competição
+                    button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') ×
+                .modal-body
+                    p Deseja deletar essa competição? Será deletado todos as submissões e problemas cadastrados
+                .modal-footer
+                    button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
+                    a.btn.btn-primary(href="/delete_competicao/"+listaCompetiton._id) Excluir
     block addItem
     script.
-        //- var Requisitar = function(){
-        //- $.getJSON('http://localhost:4000/atualizaData', function(data) {
-        //-     var texto = JSON.stringify(data);
-        //-     console.log(texto);
-        //-     $('#teste').html(texto);
-        //-     setTimeout(function(){ Requisitar(); },1000);//1000=a um segundo, altere conforme o necessario
-        //- });
+        //- function myFunction() {
+        //-     var url = window.location.href+'#nav-placar';
+        //-     $.get(url, function(resultado){
+        //-         $('#fullPage').html(resultado);
+        //-     });
         //- };
+        $(document).ready(function(){
+            var tab_on = location.hash; // aqui é onde vamos agarrar o valor da hash do url (ex: #listaReservas)
+            
+            $('#myTab a[data-target="' +tab_on+ '"]').tab('show');
+            $('#myTab a').on('click', function() {
+                var this_target = $(this).data('target');
+                var window_href = window.location.href.split('#')[0];
+                history.pushState('', '', window_href+this_target); // mudar o url dinamicamente
+            });
 
+            $(function(){
+                $("#mytable").tablesorter({
+                    sortList: [[3,1],[4,0]] 
+                });
+            });
+            //- var Requisitar = function(){
+            //-     $('#teste').append(texto);
+            //-     $('#teste').load(url);
+            //-     setTimeout(function(){ console.log("aaa"); },1000);//1000=a um segundo, altere conforme o necessario
+            //- };
+        });
         //- Requisitar();
         //- setTimeout(function(){ 
         //-     //- $.getJSON('http://localhost:4000/atualizaData', function(json) {

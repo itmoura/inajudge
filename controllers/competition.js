@@ -9,6 +9,9 @@ module.exports = function(app) {
 	var Contest = app.models.contests;
 	var Problem = app.models.problems;
 	var Submit = app.models.submits;	
+	var Users = app.models.users;	
+	moment.locale('pt-BR');
+	
  	var CompetitionController = {
 		index: function(req,res) {
 			Contest.find().sort( {'_id': -1} ).exec(function(err, data){
@@ -19,6 +22,7 @@ module.exports = function(app) {
 				var hora_atual = moment().format('LT'); 
 				res.render('competition/index', { title: 'Veja todas as competições', listContests: data, moment: moment, data_atual: data_atual, hora_atual: hora_atual  });
 			});
+			// global.id = req.user._id;
 		},
 		valida_senha: function(req,res){
 			var senha = req.body.senha;
@@ -37,7 +41,6 @@ module.exports = function(app) {
 			});
 		},
 		room: function(req,res) {
-			console.log(id_competidorGlobal);
 			Contest.findById(req.params.id, function(err, data){
 				if (err) {
 					console.log('Deu erro em room'+err);
@@ -47,12 +50,13 @@ module.exports = function(app) {
 						if (err) {
 							console.log('Deu erro em room'+err);
 						}
-						Submit.find({'id_competidor': id_competidorGlobal, 'id_room': data._id}).sort( {'_id': -1} ).exec(function(err, dataSubmit){
+						
+						Submit.find({'id_competidor': req.user._id, 'id_room': data._id}).sort( {'_id': -1} ).exec(function(err, dataSubmit){
 							if (err) {
 								console.log('Deu erro em room'+err);
 							} 
+							
 							Submit.aggregate([
-								{ $match: { id_competidor: id_competidorGlobal  } },
 								{ $group : 
 									{ 
 										_id : "$id_problem", 
@@ -77,6 +81,9 @@ module.exports = function(app) {
 										data_atual: {
 											$push: "$data_atual"
 										},
+										letra_problem: {
+											$push: "$letra_problem"
+										},
 										count: { 
 											$sum: 1 
 										}
@@ -99,6 +106,9 @@ module.exports = function(app) {
 											id_competidor: {
 												$push: "$id_competidor"
 											},
+											nome_competidor: {
+												$push: "$nome_competidor"
+											},
 											id_room: {
 												$push: "$id_room"
 											},
@@ -114,6 +124,9 @@ module.exports = function(app) {
 											data_atual: {
 												$push: "$data_atual"
 											},
+											hora_data: {
+												$push: "$hora_data"
+											},
 											letra_problem: {
 												$push: "$letra_problem"
 											},
@@ -121,16 +134,18 @@ module.exports = function(app) {
 												$sum: 1 
 											}
 										}
-									},
-									{ $sort : { count : -1 } }
+									}
+									// { $sort : { count : -1 } }
 									// { $sort : { "letra_problem" : 1 } }
 								  ]).exec(function(err, rank){
 									if (err) {
 										console.log('Deu erro em room'+err);
 									}
-									console.log(rank);
-									 console.log(data2);
-									res.render('competition/room', {title: data.titulo, listaCompetiton: data, listProblems: data2, listaSubmit: dataSubmit, submitProblem: submitProblem, string: S, rank: rank});
+									res.render('competition/room', {
+										title: data.titulo, listaCompetiton: data, 
+										listProblems: data2, listaSubmit: dataSubmit, 
+										submitProblem: submitProblem, string: S, 
+										rank: rank, user: req.user, moment: moment});
 								});
 							});
 						});
@@ -140,7 +155,8 @@ module.exports = function(app) {
 			});			
 		},
 		atualizaData: function(req,res,callback){
-			var data_atual = moment().format();
+			var data_atual = moment().format('LTS');
+			res.render('competition/room', { data_atual: data_atual});
 		},
 		submit: function(req,res) {
 			Problem.findById(req.params.id, function(err, data){
@@ -159,13 +175,16 @@ module.exports = function(app) {
 			var filename = req.file.filename;
 			var id_room = req.body.id_room;
 			var id_problem = req.body.id_problem;
-			var id_competidor = req.body.id_competidor;
+			var id_competidor = req.user._id;
+			var nome_competidor = req.user.nome;			
 			var model = new Submit;
 			model.id_competidor = id_competidor;
+			model.nome_competidor = nome_competidor;
 			model.id_room = id_room;
 			model.id_problem = id_problem;
 			model.data_atual = moment().format('DD/MM/YYYY');
 			model.hora_atual = moment().format('LT'); 
+			model.hora_data = moment().format();
 			model.filename = filename;
 			Problem.findOne({ _id: id_problem }, function(err, getLetra){
 				if (err) {
@@ -179,40 +198,36 @@ module.exports = function(app) {
 						res.write('<script>alert("Falha ao enviar!"); window.location="../"</script>');
 					}
 					else {
-						Problem.findOne().sort({'_id': -1}).exec(function(err, data){
+						// Problem.findOne().sort({'_id': -1}).exec(function(err, data){
+						// 	if (err) {
+						// 		console.log('Deu erro em room '+err);
+						// 	} 
+						// 	else {
+						model.resposta = Math.floor(Math.random() * (1 - 0 + 1) + 0);
+						model.save(function(err){
 							if (err) {
-								console.log('Deu erro em room '+err);
-							} 
-							else {
-								model.resposta = Math.floor(Math.random() * (1 - 0 + 1) + 0);
-								model.save(function(err){
-									if (err) {
-										console.log(err);
-										res.write('<script>alert("Falha ao enviar!"); window.location="../"</script>');
-									} else {
-										res.redirect('http://localhost:4000/competition/room/'+id_room);
-									}
-								});
+								console.log(err);
+								res.write('<script>alert("Falha ao enviar!"); window.location="../"</script>');
+							} else {
+								res.redirect('http://localhost:4000/competition/room/'+id_room);
 							}
-						});	
+						});
+						// 	}
+						// });	
 					}
 				});
 	  		});
 		},
 		create_room: function(req, res){
 			var model = new Contest;
-			model.autor = "@itmoura";
+			model.id_autor = req.user._id;
+			model.nome_autor = req.user.nome;
 			model.senha = req.body.senha;
 			model.data_inicio = req.body.data_inicio;
 			model.data_fim = req.body.data_fim;
 			model.titulo = req.body.title;
 			model.descricao = req.body.description;
-			console.log(req.body.title);
-			// var i = 0;
-			// while(i < 10000000000){
-			// 	i++;
-			// }
-			// console.log("saiu");
+			model.liberado = false;
 			model.save(function(err){
 				if (err) {
 					console.log(err);
@@ -222,6 +237,91 @@ module.exports = function(app) {
 					res.redirect('/competition/room/'+data._id);
 				});
 	  		});
+		},
+		editar_room: function(req,res){
+			Contest.findById(req.body.id_competition, function(err, data){
+				if (err) {
+					console.log(err);
+				} else {
+					var model = data;
+					var id_sala = req.body.id_competition;
+					model.senha = req.body.senha;
+					model.data_inicio = req.body.data_inicio;
+					model.data_fim = req.body.data_fim;
+					model.titulo = req.body.titulo;
+					model.descricao = req.body.descricao;
+					model.save(function(err){
+						if (err) {
+							console.log(err);
+						} else{
+							res.redirect('/competition/room/'+id_sala);
+						}
+					});
+				}
+			});
+		},
+		deletar_room: function(req,res){
+			Contest.remove({_id: req.params.id}, function(err){
+				if (err) {
+					console.log(err);
+				} else {
+					Problem.remove({'id_competition': req.params.id}, function(err){
+						if(err){
+							console.log(err);
+						} else {
+							Submit.remove({'id_room': req.params.id}, function(err){
+								if(err){
+									console.log(err);
+								} else {
+									res.redirect('/competition');
+								}
+							});
+						}
+					});
+				}
+			});
+		},
+		deletar_problema: function(req,res){
+			Problem.remove({_id: req.params.id}, function(err){
+				if(err){
+					console.log(err);
+				} else {
+					Submit.remove({'id_problema': req.params.id}, function(err){
+						if(err){
+							console.log(err);
+						} else {
+							res.redirect('/competition');
+						}
+					});
+				}
+			});
+		},
+		atualizar_competicao: function(req,res){
+			Contest.findById(req.params.id, function(err, data){
+				if (err) {
+					console.log(err);
+				} else {
+					console.log(data);			
+					var model = data;
+					var id_sala = data._id;
+					// if(data.liberado == null){
+					// 	model.liberado = true;
+					// 	model.data_inicio = 
+					// }
+					if(data.liberado == false)
+						model.liberado = true;
+					else {
+						model.liberado = false;
+					}
+					model.save(function(err){
+						if (err) {
+							console.log(err);
+						} else{
+							res.redirect('/competition/room/'+id_sala);
+						}
+					});
+				}
+			});
 		},
 		upload_problem: function(req, res, next){
 			var model = new Problem;
@@ -242,7 +342,7 @@ module.exports = function(app) {
 					res.write('<script>alert("Falha ao cadastrar!"); window.location="../"</script>');
 				}				
 				Problem.findOne().sort({'_id': -1}).exec(function(err, data){
-					fs.createReadStream('./public/contest/'+req.file.filename).pipe(unzip.Extract({ path: './public/contest/'+data.id_competition+'/'+data._id}));
+					//-fs.createReadStream('./public/contest/'+req.file.filename).pipe(unzip.Extract({ path: './public/contest/'+data.id_competition+'/'+data._id}));
 					res.redirect('/competition/room/'+data.id_competition);
 				});
 	  		});

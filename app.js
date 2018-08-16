@@ -103,7 +103,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(allowCrossDomain);
 app.use(require('express-session')({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
 
-global.id_competidorGlobal = "id_competidor";  
+
+
 // app.use(express.static(__dirname, 'uploads'));
 
 // Initialize Passport and restore authentication state, if any, from the
@@ -147,7 +148,19 @@ app.post('/login',
 passport.authenticate('local', { failureRedirect: '/login' }),
 function(req, res) {
   res.redirect('/competition');
+  global.id_competidorGlobal = req.user._id;  
 });
+
+// var Usuarios = app.models.users;
+// var model = new Usuarios;
+// model.nome = "Usuario 3";
+// model.email = "user3";
+// model.senha = createHash("123");
+// model.save(function(err){
+//   if (err) {
+//     console.log(err);
+//   }	
+// });
 
 app.get('/logout',
 function(req, res){

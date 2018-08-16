@@ -37,6 +37,9 @@ module.exports = function(app){
 
     // Criando sala da competição
 	app.post('/create_room', competition.create_room);
+	app.post('/edt_competicao', competition.editar_room);
+	app.get('/delete_competicao/:id', require('connect-ensure-login').ensureLoggedIn(), competition.deletar_room);
+	app.get('/atualizar_competicao/:id', require('connect-ensure-login').ensureLoggedIn(), competition.atualizar_competicao);
 	// Upload input e outpus problems
 	app.post('/upload_problem', upload.single('arquivo'), competition.upload_problem);
 	// Validando a senha para entrar na sala

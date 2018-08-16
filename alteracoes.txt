@@ -1,0 +1,8 @@
+- Depois do incio da competição só pode alterar o fim dela (bloquear o inicio)
+
+- Quando entrar na competição, salvar seu acesso (Para não ser necessaario entrar com a senha novamente)
+  - Mudar o icone de acesso;
+  - Criar botões para separar a tela entre competições acontecendo, próximas e acabadas;
+  - Não permitir o envio de código depois do fim da competição.
+
+- Arrumar tela do problema (exp: problema A)

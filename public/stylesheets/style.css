@@ -4,6 +4,10 @@ body {
 
 a {
   	color: #00B7FF;
+	
+}
+a:hover {
+	text-decoration: none !important;
 }
 
 /* DEFAULTS */
@@ -13,6 +17,12 @@ a {
 	.borderSuccess {border-color: green;}
 	
 /* -------- */
+
+/* LOGIN */
+.account-wall {position: relative; margin: 80px auto; width: 300px; text-align: center;}
+.account-wall img {border-radius: 80px; margin-bottom: 20px;}
+.account-wall form input {margin-bottom: 10px;}
+
 
 nav {background-color: cornflowerblue; margin-bottom: 15px; padding-top: 10px;}
 nav .container a {color: #ffffff;}
@@ -43,7 +53,17 @@ nav .container a {color: #ffffff;}
 		.sendProblem select {margin-bottom: 10px;}
 		.sendProblem button {margin-top: 10px; float: right;}
 		.topo {position: relative; float: right; text-align: right}
-		.face {color: tomato;}
+		.face {color: #000000;}
+		.normal a {color: #000000;}
+		.normal a:hover {color: #000000;}
+		/* se respota for correta */
+		.sucesso {border: 1px solid green !important; color: green;}
+		.sucesso .face {color: green;}
+		.sucesso:hover {color: green;}
+		/* se respota for recusada */
+		.falha {border: 1px solid tomato !important; color: tomato;}
+		.falha .face {color: tomato;}
+		.falha:hover {color: tomato;}
 	/* PROBLEMA */
 		.topo2 {margin-top: 15px;}
 		.fundinho {background-color: lightslategrey; width: 100%; min-height: 80px; border-radius: 10px; color: #fff; padding-left: 10px;}
