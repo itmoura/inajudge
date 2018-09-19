@@ -37,7 +37,7 @@ function decrypt(text){
   return dec;
 }
 // Connect to Database
-mongoose.connect('mongodb://onlinejudge:teste123@ds263759.mlab.com:63759/onlinejudgeinatel', function(err){
+mongoose.connect('mongodb://onlinejudge:novaSenha123@ds163382.mlab.com:63382/onlinejudgeinatel', function(err){
   if(err) {
     console.log('Erro ao conectar no mongodb: '+err);
   }
@@ -52,10 +52,6 @@ passport.use(new Strategy(
         if (err) { return cb(err); }
         if (!user) { return cb(null, false); }
         if (!isValidPassword(user, password)) { return cb(null, false); }
-
-        //mongoose.connect(decrypt(user.database));
-
-        //console.log("Meu BD: "+ conn2.host)
 
         return cb(null, user);
     });
@@ -82,7 +78,7 @@ passport.deserializeUser(function(id, cb) {
 var app = express();
 
 // Use the session middleware
-app.use(session({ secret: '#$%¨&*()ko', cookie: { maxAge: 60000 }}))  // secret: keyboard cat
+app.use(session({ secret: '#$%¨&*()ko15das', cookie: { maxAge: 60000 }}))  // secret: keyboard cat
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -156,6 +152,7 @@ function(req, res) {
 // model.nome = "Usuario 3";
 // model.email = "user3";
 // model.senha = createHash("123");
+// model.competicoes = "1";
 // model.save(function(err){
 //   if (err) {
 //     console.log(err);

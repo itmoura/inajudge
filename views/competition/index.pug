@@ -8,92 +8,355 @@ block content
             .col-md-3
                 a.btn.btn-primary(href="http://localhost:4000/competition/create", style="float: right;") Criar Competição
             section.col-md-12
-                //- TABLE
-                table#mytable.table
-                    thead.thead-dark
-                        tr
-                        th(scope='col') #
-                        th(scope='col') Título
-                        th(scope='col') Inicio
-                        th(scope='col') Fim
-                        th(scope='col') Criado por
-                        th(scope='col') Acesso
-                    tbody
-                        //- - var data_atual = moment(data_atual).format('DD/MM/YYYY')
-                        //- - var hora_atual = moment(hora_atual).format('HH:mm')
-                        each lista, i in listContests
-                            - var cor = "warning"
-                            //- - var data_inicio = moment(lista.data_inicio).format('DD/MM/YYYY')
-                            //- - var data_fim = moment(lista.data_fim).format('DD/MM/YYYY')
-                            //- - var hora_inicio = moment(lista.data_inicio).format('HH:mm')
-                            //- - var hora_fim = moment(lista.data_fim).format('HH:mm')
-                            //- if(data_inicio == data_atual && hora_atual > hora_inicio && hora_atual < hora_fim)
-                            tr(class='table-'+cor, data-toggle="modal" data-target='#'+lista._id)
-                                th(scope='row') #{i}
-                                td #{lista.titulo}
-                                td #{moment(lista.data_inicio).format('DD/MM HH:mm')}
-                                td #{moment(lista.data_fim).format('DD/MM HH:mm')}
-                                td #{lista.nome_autor}
-                                if(lista.senha == "")
-                                    td 
-                                        i.large.material-icons lock_open
-                                else
-                                    td 
-                                        i.large.material-icons lock_outline
-                            //- tr.table-danger Essa cor quando a competição estiver acabando (10 minutos)
-                            //- tr.table-warning Essa cor quando a competição estiver em andamento
-                            //- tr.table-light Essa cor quando a competição ainda não se iniciou
-                            //- Modal
-                            .modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true', id=''+lista._id)
-                                .modal-dialog(role='document')
-                                    .modal-content
-                                        .modal-header
-                                            h5#exampleModalLabel.modal-title #{lista.titulo}
-                                            button.close(type='button', data-dismiss='modal', aria-label='Close')
-                                                span(aria-hidden='true') ×
-                                        .modal-body
-                                            if(lista.senha == "")
-                                                p Essa sala não possui senha.
-                                                input.form-control.col-md-4.senha(type='hidden', name='senha', placeholder="Senha")
-                                                input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)
+                section.escolha
+                    //- #myTab.nav.nav-tabs(role='tablist')
+                    //-     .col-md-1.floatLeft
+                    //-     .col-md-3.floatLeft
+                    //-         a.card.danger.default#nav-acontecendo-tab.nav-item.nav-link.active(data-toggle='tab', href='#nav-acontecendo', role='tab', data-target='#nav-acontecendo', aria-target='nav-acontecendo', aria-selected='true')
+                    //-             div.topo
+                    //-                 i.large.material-icons.face insert_emoticon
+                    //-             p Acontecendo
+                    //-     .col-md-3.floatLeft
+                    //-         a.card.warning.default#nav-proximas-tab.nav-item.nav-link(data-toggle='tab', href='#nav-proximas', role='tab', data-target='#nav-proximas', aria-target='nav-proximas', aria-selected='false')
+                    //-             div.topo
+                    //-                 i.large.material-icons.face sentiment_satisfied_alt
+                    //-             p Próximas
+                    //-     .col-md-3.floatLeft
+                    //-         a.card.acabadas.default#nav-acabadas-tab.nav-item.nav-link(data-toggle='tab', href='#nav-acabadas', role='tab', data-target='#nav-acabadas', aria-target='nav-acabadas', aria-selected='false')
+                    //-             div.topo
+                    //-                 i.large.material-icons.face face
+                    //-             p Acabadas
+                    //-     .col-md-1.floatLeft
+                    #myTab.nav(role='tablist')
+                        .col-md-1.floatLeft
+                        a.col-md-3#nav-acontecendo-tab.nav-item.nav-link.active(data-toggle='tab', href='#nav-acontecendo', role='tab', data-target='#nav-acontecendo', aria-target='nav-acontecendo', aria-selected='true')
+                            .card.danger.default
+                                div.topo
+                                    i.large.material-icons.face insert_emoticon
+                                p Acontecendo
+                        a.col-md-3#nav-proximas-tab.nav-item.nav-link(data-toggle='tab', href='#nav-proximas', role='tab', data-target='#nav-proximas', aria-target='nav-proximas', aria-selected='false')
+                            .card.warning.default
+                                div.topo
+                                    i.large.material-icons.face insert_emoticon
+                                p Próximas
+                        a.col-md-3#nav-acabadas-tab.nav-item.nav-link(data-toggle='tab', href='#nav-acabadas', role='tab', data-target='#nav-acabadas', aria-target='nav-acabadas', aria-selected='false')
+                            .card.acabadas.default
+                                div.topo
+                                    i.large.material-icons.face insert_emoticon
+                                p Acabadas
+                        .col-md-1.floatLeft
+                    #nav-tabContent.tab-content
+                        #nav-acontecendo.tab-pane.fade.show.active(role='tabpanel', aria-labelledby='nav-acontecendo-tab')
+                            table#mytable.table
+                                thead.thead-dark
+                                    tr
+                                    th(scope='col') #
+                                    th(scope='col') Título
+                                    th(scope='col') Inicio
+                                    th(scope='col') Fim
+                                    th(scope='col') Criado por
+                                    th(scope='col') Acesso
+                                tbody
+                                    each lista, i in listContests
+                                        - if(moment(lista.data_inicio).format() <= moment().format() && moment(lista.data_fim).format() >= moment().format())
+                                            - var cor = "danger"
+                                            - var quebra_competicao = string(user.competicoes).parseCSV(",");
+                                            - var qnt = quebra_competicao.length;
+                                            - var link = null;
+                                            - for(var j = 0; qnt > j; j++){
+                                                - if(quebra_competicao[j] == lista._id){
+                                                    - link = lista._id;
+                                                    - break;
+                                                - }								
+                                            - }
+                                            if(link == lista._id)
+                                                tr.tabelaLink(class='table-'+cor)
+                                                    th(scope='row') 
+                                                        a(href="/competition/room/"+lista._id) #{i}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) #{lista.titulo}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) #{moment(lista.data_inicio).format('DD/MM HH:mm')}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) #{moment(lista.data_fim).format('DD/MM HH:mm')}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) #{lista.nome_autor}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) 
+                                                            i.large.material-icons lock_open
                                             else
-                                                p Essa sala possui senha, insira a senha abaixo e entre
-                                                input.form-control.col-md-4.senha(type='text', name='senha', placeholder="Senha")
-                                                input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)                                      
-                                                br
-                                            p criado por #{lista.autor}
-                                        .modal-footer
-                                            button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
-                                            button.btn.btn-primary(type='button') Entrar
-                                            script.
-                                                $(".btn-primary").click(function(){
-                                                    var _id = $(this).parent().parent().find('._id').val();                                            
-                                                    var senha = $(this).parent().parent().find('.senha').val();
-                                                    var valida = 0;         
-                                                    $.ajax({
-                                                        url: "/competition/valida_senha",
-                                                        data: {
-                                                            senha: senha,
-                                                            _id: _id,
-                                                            valida: valida
-                                                        },
-                                                        type: "POST",
-                                                        complete: function(data) {
-                                                            console.log(data);
-                                                            if(data.status == 200)
-                                                                window.location.href = ("/competition/room/"+_id);
-                                                            else {
-                                                                $(".senha").val("");
-                                                            }
-                                                        }
-                                                    });
-                                                });
-                    table.table
+                                                tr(class='table-'+cor, data-toggle="modal" data-target='#'+lista._id)
+                                                    th(scope='row') #{i}
+                                                    td 
+                                                        p #{lista.titulo}
+                                                    td 
+                                                        p #{moment(lista.data_inicio).format('DD/MM HH:mm')}
+                                                    td 
+                                                        p #{moment(lista.data_fim).format('DD/MM HH:mm')}
+                                                    td 
+                                                        p #{lista.nome_autor}
+                                                    td 
+                                                        p
+                                                            i.large.material-icons lock_outline  
+
+                                            .modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true', id=''+lista._id)
+                                                .modal-dialog(role='document')
+                                                    .modal-content
+                                                        .modal-header
+                                                            h5#exampleModalLabel.modal-title #{lista.titulo}
+                                                            button.close(type='button', data-dismiss='modal', aria-label='Close')
+                                                                span(aria-hidden='true') ×
+                                                        .modal-body
+                                                            if(lista.senha == "")
+                                                                p Essa sala não possui senha.
+                                                                input.form-control.col-md-4.senha(type='hidden', name='senha', placeholder="Senha")
+                                                                input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)
+                                                            else
+                                                                p Essa sala possui senha, insira a senha abaixo e entre
+                                                                input.form-control.col-md-4.senha(type='text', name='senha', placeholder="Senha")
+                                                                input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)                                      
+                                                                br
+                                                            p criado por #{lista.autor}
+                                                        .modal-footer
+                                                            button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
+                                                            button.btn.btn-primary(type='button') Entrar
+                                                            script.
+                                                                $(".btn-primary").click(function(){
+                                                                    var _id = $(this).parent().parent().find('._id').val();                                            
+                                                                    var senha = $(this).parent().parent().find('.senha').val();
+                                                                    var valida = 0;         
+                                                                    $.ajax({
+                                                                        url: "/competition/valida_senha",
+                                                                        data: {
+                                                                            senha: senha,
+                                                                            _id: _id,
+                                                                            valida: valida
+                                                                        },
+                                                                        type: "POST",
+                                                                        complete: function(data) {
+                                                                            console.log(data);
+                                                                            if(data.status == 200)
+                                                                                window.location.href = ("/competition/room/"+_id);
+                                                                            else {
+                                                                                $(".senha").val("");
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                });
+                                table.table
+                        #nav-proximas.tab-pane.fade.show(role='tabpanel', aria-labelledby='nav-proximas-tab')
+                            table#mytable2.table
+                                thead.thead-dark
+                                    tr
+                                    th(scope='col') #
+                                    th(scope='col') Título
+                                    th(scope='col') Inicio
+                                    th(scope='col') Fim
+                                    th(scope='col') Criado por
+                                    th(scope='col') Acesso
+                                tbody
+                                    each lista, i in listContests
+                                        //- p #{moment(lista.data_inicio).format('DD/MM HH:mm')} > #{moment().format('DD/MM HH:mm')}
+                                        if(moment(lista.data_inicio).format() > moment().format())
+                                            - var cor = "warning"
+                                            - var quebra_competicao = string(user.competicoes).parseCSV(",");
+                                            - var qnt = quebra_competicao.length;
+                                            - var link = null;
+                                            - for(var j = 0; qnt > j; j++){
+                                                - if(quebra_competicao[j] == lista._id){
+                                                    - link = lista._id;
+                                                    - break;
+                                                - }								
+                                            - }
+                                            if(link == lista._id)
+                                                tr.tabelaLink(class='table-'+cor)
+                                                    th(scope='row') 
+                                                        a(href="/competition/room/"+lista._id) #{i}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) #{lista.titulo}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) #{moment(lista.data_inicio).format('DD/MM HH:mm')}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) #{moment(lista.data_fim).format('DD/MM HH:mm')}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) #{lista.nome_autor}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) 
+                                                            i.large.material-icons lock_open
+                                            else
+                                                tr(class='table-'+cor, data-toggle="modal" data-target='#'+lista._id)
+                                                    th(scope='row') #{i}
+                                                    td 
+                                                        p #{lista.titulo}
+                                                    td 
+                                                        p #{moment(lista.data_inicio).format('DD/MM HH:mm')}
+                                                    td 
+                                                        p #{moment(lista.data_fim).format('DD/MM HH:mm')}
+                                                    td 
+                                                        p #{lista.nome_autor}
+                                                    td 
+                                                        p
+                                                            i.large.material-icons lock_outline
+
+                                            .modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true', id=''+lista._id)
+                                                .modal-dialog(role='document')
+                                                    .modal-content
+                                                        .modal-header
+                                                            h5#exampleModalLabel.modal-title #{lista.titulo}
+                                                            button.close(type='button', data-dismiss='modal', aria-label='Close')
+                                                                span(aria-hidden='true') ×
+                                                        .modal-body
+                                                            if(lista.senha == "")
+                                                                p Essa sala não possui senha.
+                                                                input.form-control.col-md-4.senha(type='hidden', name='senha', placeholder="Senha")
+                                                                input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)
+                                                            else
+                                                                p Essa sala possui senha, insira a senha abaixo e entre
+                                                                input.form-control.col-md-4.senha(type='text', name='senha', placeholder="Senha")
+                                                                input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)                                      
+                                                                br
+                                                            p criado por #{lista.autor}
+                                                        .modal-footer
+                                                            button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
+                                                            button.btn.btn-primary(type='button') Entrar
+                                                            script.
+                                                                $(".btn-primary").click(function(){
+                                                                    var _id = $(this).parent().parent().find('._id').val();                                            
+                                                                    var senha = $(this).parent().parent().find('.senha').val();
+                                                                    var valida = 0;         
+                                                                    $.ajax({
+                                                                        url: "/competition/valida_senha",
+                                                                        data: {
+                                                                            senha: senha,
+                                                                            _id: _id,
+                                                                            valida: valida
+                                                                        },
+                                                                        type: "POST",
+                                                                        complete: function(data) {
+                                                                            console.log(data);
+                                                                            if(data.status == 200)
+                                                                                window.location.href = ("/competition/room/"+_id);
+                                                                            else {
+                                                                                $(".senha").val("");
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                });
+                                table.table
+                        #nav-acabadas.tab-pane.fade.show(role='tabpanel', aria-labelledby='nav-acabadas-tab')
+                            table#mytable3.table
+                                thead.thead-dark
+                                    tr
+                                    th(scope='col') #
+                                    th(scope='col') Título
+                                    th(scope='col') Inicio
+                                    th(scope='col') Fim
+                                    th(scope='col') Criado por
+                                    th(scope='col') Acesso
+                                tbody
+                                    each lista, i in listContests
+                                        if(lista.data_fim < moment().format())
+                                            - var cor = "success"
+                                            - var quebra_competicao = string(user.competicoes).parseCSV(",");
+                                            - var qnt = quebra_competicao.length;
+                                            - var link = null;
+                                            - for(var j = 0; qnt > j; j++){
+                                                - if(quebra_competicao[j] == lista._id){
+                                                    - link = lista._id;
+                                                    - break;
+                                                - }								
+                                            - }
+                                            if(link == lista._id)
+                                                tr.tabelaLink(class='table-'+cor)
+                                                    th(scope='row') 
+                                                        a(href="/competition/room/"+lista._id) #{i}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) #{lista.titulo}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) #{moment(lista.data_inicio).format('DD/MM HH:mm')}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) #{moment(lista.data_fim).format('DD/MM HH:mm')}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) #{lista.nome_autor}
+                                                    td 
+                                                        a(href="/competition/room/"+lista._id) 
+                                                            i.large.material-icons lock_open
+                                            else
+                                                tr(class='table-'+cor, data-toggle="modal" data-target='#'+lista._id)
+                                                    th(scope='row') #{i}
+                                                    td 
+                                                        p #{lista.titulo}
+                                                    td 
+                                                        p #{moment(lista.data_inicio).format('DD/MM HH:mm')}
+                                                    td 
+                                                        p #{moment(lista.data_fim).format('DD/MM HH:mm')}
+                                                    td 
+                                                        p #{lista.nome_autor}
+                                                    td 
+                                                        p
+                                                            i.large.material-icons lock_outline        
+
+                                            .modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true', id=''+lista._id)
+                                                .modal-dialog(role='document')
+                                                    .modal-content
+                                                        .modal-header
+                                                            h5#exampleModalLabel.modal-title #{lista.titulo}
+                                                            button.close(type='button', data-dismiss='modal', aria-label='Close')
+                                                                span(aria-hidden='true') ×
+                                                        .modal-body
+                                                            if(lista.senha == "")
+                                                                p Essa sala não possui senha.
+                                                                input.form-control.col-md-4.senha(type='hidden', name='senha', placeholder="Senha")
+                                                                input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)
+                                                            else
+                                                                p Essa sala possui senha, insira a senha abaixo e entre
+                                                                input.form-control.col-md-4.senha(type='text', name='senha', placeholder="Senha")
+                                                                input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)                                      
+                                                                br
+                                                            p criado por #{lista.autor}
+                                                        .modal-footer
+                                                            button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
+                                                            button.btn.btn-primary(type='button') Entrar
+                                                            script.
+                                                                $(".btn-primary").click(function(){
+                                                                    var _id = $(this).parent().parent().find('._id').val();                                            
+                                                                    var senha = $(this).parent().parent().find('.senha').val();
+                                                                    var valida = 0;         
+                                                                    $.ajax({
+                                                                        url: "/competition/valida_senha",
+                                                                        data: {
+                                                                            senha: senha,
+                                                                            _id: _id,
+                                                                            valida: valida
+                                                                        },
+                                                                        type: "POST",
+                                                                        complete: function(data) {
+                                                                            console.log(data);
+                                                                            if(data.status == 200)
+                                                                                window.location.href = ("/competition/room/"+_id);
+                                                                            else {
+                                                                                $(".senha").val("");
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                });
+                                table.table
     block addItem
         script.
             $(document).ready(function(){
                 $(function(){
                     $("#mytable").tablesorter();
+                    $("#mytable2").tablesorter();
+                    $("#mytable3").tablesorter();
+                });
+
+                var tab_on = location.hash; // aqui é onde vamos agarrar o valor da hash do url (ex: #listaReservas)
+                
+                $('#myTab a[data-target="' +tab_on+ '"]').tab('show');
+                $('#myTab a').on('click', function() {
+                    var this_target = $(this).data('target');
+                    var window_href = window.location.href.split('#')[0];
+                    history.pushState('', '', window_href+this_target); // mudar o url dinamicamente
                 });
                 
             });

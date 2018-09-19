@@ -29,7 +29,7 @@ nav .container a {color: #ffffff;}
 
 /* RODAPE */
 .rodape {margin-top: 15px;}
-.rodape .return {right: 80px; bottom: 20px; position: absolute;}
+.rodape .return {right: 80px; bottom: 20px; position: fixed;}
 .rodape .return:hover {cursor: pointer;}
 
 #arquivoInput.form-control {width: auto;}
@@ -38,6 +38,22 @@ nav .container a {color: #ffffff;}
 .remove_field {color: red; margin-top: 15px; margin-left: 5px;}
 
 /* COMPETIÇÃO */
+	/* INDEX */
+		.escolha {margin-top: 15px;}
+		.escolha .default {font-size: 24px; text-align: center; text-transform: uppercase;}
+		.escolha .default i {font-size: 32px;}
+		.escolha .danger {color: red; border: 1px solid red !important;}
+		.escolha .danger i {color: red;}
+		.escolha .warning {color: gold; border: 1px solid gold !important;}
+		.escolha .warning i {color: gold;}
+		.escolha .acabadas {color: cornflowerblue; border: 1px solid cornflowerblue !important;}
+		.escolha .acabadas i {color: cornflowerblue;}
+		#mytable {margin-top: 15px;}
+		#mytable3 {margin-top: 15px;}
+		#mytable2 {margin-top: 15px;}
+
+		.tabelaLink td a, th a {color: #000000;}
+		tr td p, tr th p {cursor: pointer;}
 	/* SubMenu */
 		.navSubmenu {background-color: transparent; margin-top: 35px; width: 100%;}
 		.navSubmenu .active {color: cornflowerblue !important; background-color: transparent !important; border-color: transparent !important;}
@@ -67,3 +83,7 @@ nav .container a {color: #ffffff;}
 	/* PROBLEMA */
 		.topo2 {margin-top: 15px;}
 		.fundinho {background-color: lightslategrey; width: 100%; min-height: 80px; border-radius: 10px; color: #fff; padding-left: 10px;}
+	/* ESCLARECIMENTO */
+		.esclarecimento {margin-top: 15px;}
+		.esclarecimento span {color: darkgrey;}
+		.esclarecimento .letraProblema {right: 20px; position: absolute;}

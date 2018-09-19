@@ -6,6 +6,7 @@ module.exports = function(){
 	var problems = new Schema({
         id_competition: String,
 		letra: String,
+		cor: String,
 		nome: String,
 		time: String,
 		descricao: String,

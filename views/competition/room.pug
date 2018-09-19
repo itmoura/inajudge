@@ -8,10 +8,19 @@ block content
                     if(user._id == listaCompetiton.id_autor)
                         button.btn.btn-warning(data-toggle="modal" data-target='#edtCompeticao') Editar
                         button.btn.btn-danger(data-toggle="modal", data-target='#deleteCompeticao', style="margin-left: 10px;") Deletar
-                        if(listaCompetiton.liberado == false)
-                            a.btn.btn-success(href="/atualizar_competicao/"+listaCompetiton._id,  style="margin-left: 10px; color: #fff;") Iniciar Competição
+                        -var liberaCompe = 0;
+                        -if(listaCompetiton.liberado == null && moment().format() < moment(listaCompetiton.data_inicio).format())
+                            -liberaCompe = 0;
+                        -else if(listaCompetiton.liberado == null && moment().format() >= moment(listaCompetiton.data_inicio).format())
+                            -liberaCompe = 1;
+                        -else if(listaCompetiton.liberado == true)
+                            -liberaCompe = 1;
+                        -else if(listaCompetiton.liberado == false)
+                            -liberaCompe = 0;
+                        if(liberaCompe == 0)
+                            a.btn.btn-success(href="/atualizar_competicao/"+listaCompetiton._id+'/true',  style="margin-left: 10px; color: #fff;") Iniciar Competição
                         else
-                            a.btn.btn-danger(href="/atualizar_competicao/"+listaCompetiton._id, style="margin-left: 10px; color: #fff;") Parar Competição
+                            a.btn.btn-danger(href="/atualizar_competicao/"+listaCompetiton._id+'/false', style="margin-left: 10px; color: #fff;") Parar Competição
             //- se user.autor == user logado
             //- Modal
             if(user._id == listaCompetiton.id_autor)
@@ -126,7 +135,7 @@ block content
 
                     .col-md-3.floatLeft
                         - if(moment().format() < moment(listaCompetiton.data_fim).format()){
-                            if(listProblems == null || listaCompetiton.liberado == true)
+                            if(liberaCompe == 1)
                                 form.form-group.sendProblem(action='/submit/code', method='post', enctype="multipart/form-data")
                                     input(value=listaCompetiton._id, name="id_room", type="hidden")
                                     input(value=user._id, name="id_competidor", type="hidden")
@@ -308,12 +317,41 @@ block content
                                     td #{listaS.hora_atual}
         //- FIM TAB 3
         //- -----------------------------------------------------------------
-        //- INICIO TAB 3
+        //- INICIO TAB 4
         #nav-esclarecimento.tab-pane.fade(role='tabpanel', aria-labelledby='nav-esclarecimento-tab')
             .container
                 .row
-                    p TAB esclarecimento
-        //- FIM TAB 3
+                    .col-md-3
+                        form(action='/esclarecimento', method='post')
+                            .form-group
+                                input(type="hidden", name="id_competition", value=listaCompetiton._id)
+                                label(for='problema') Selecione o problema
+                                select#problema.form-control(name="letra")
+                                    option Selecione o problema
+                                    each lista, i in listProblems
+                                        option(value=lista.letra) #{lista.letra}
+                            .form-group
+                                label(for='duvida') Dúvidas
+                                textarea#duvida.form-control(rows='8', name="pergunta")
+                            button.btn.btn-primary(type='submit') Enviar
+                    .col-md-8
+                        each listaDuvidas, i in esclarecimento
+                            div.card.esclarecimento
+                                span Pergunta: 
+                                span.letraProblema Problema #{listaDuvidas.letra}
+                                p #{listaDuvidas.pergunta}
+                                hr
+                                span Resposta: 
+                                if(user._id == listaCompetiton.id_autor)
+                                    form(action='/respesclarecimento/'+listaDuvidas._id, method='post')
+                                        .form-group
+                                            textarea#duvida.form-control(rows='5', name="resposta") #{listaDuvidas.resposta}
+                                        button.btn.btn-primary.float-right(type='submit') Enviar
+                                else 
+                                    p #{listaDuvidas.resposta}
+                    
+
+        //- FIM TAB 4
         //- -----------------------------------------------------------------
         
     .modal.fade(tabindex='-1', role='dialog', aria-labelledby='myLargeModalLabel', aria-hidden='true', id='addProblem')
@@ -329,6 +367,8 @@ block content
                         input.form-control(type='text', name='nome', placeholder="Nome do problema")
                         br
                         input.form-control(type='text', name='letra', placeholder="Letra do problema")
+                        br
+                        input.form-control(type='text', name='cor', placeholder="Cor: (exemplo: #00000)")
                         br
                         input.form-control(type='number', name='limit_time', placeholder="Tempo Limite")
                         br
@@ -359,7 +399,11 @@ block content
                     .modal-body
                         input(type="hidden", name="id_competition", value=listaCompetiton._id)
                         input.form-control(type='text', name='titulo', value=listaCompetiton.titulo, style="margin-bottom: 10px;")                       
-                        input.form-control(id="datetime", type="datetime-local", name='data_inicio' value=listaCompetiton.data_inicio, required, style="margin-bottom: 10px;")
+                        if(moment().format() >= moment(listaCompetiton.data_inicio).format())
+                            input(type="hidden", id="datetime", name='data_inicio' value=listaCompetiton.data_inicio, required, style="margin-bottom: 10px;")
+                            input.form-control(type="datetime-local", value=listaCompetiton.data_inicio, disabled, style="margin-bottom: 10px;")
+                        else 
+                            input.form-control(id="datetime", type="datetime-local", name='data_inicio' value=listaCompetiton.data_inicio, required, style="margin-bottom: 10px;")
                         input.form-control(id="datetime2", type="datetime-local", name='data_fim' value=listaCompetiton.data_fim, required, style="margin-bottom: 10px;")
                         textarea.form-control(type='text', name='descricao', cols="30", rows="10", required, style="margin-bottom: 10px;") #{listaCompetiton.descricao}
                         input.form-control(type='text', name='senha', value=listaCompetiton.senha)
@@ -402,6 +446,7 @@ block content
                     sortList: [[3,1],[4,0]] 
                 });
             });
+            //- console.log($("#myTab").position().top);
             //- var Requisitar = function(){
             //-     $('#teste').append(texto);
             //-     $('#teste').load(url);

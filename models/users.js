@@ -6,7 +6,8 @@ module.exports = function(){
 	var usuarios = new Schema({
 		nome: String,
 		email: String,
-		senha: String
+		senha: String,
+		competicoes: String
 	});
 
 	return mongoose.model('Usuarios', usuarios);
