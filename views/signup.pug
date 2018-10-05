@@ -1,0 +1,41 @@
+doctype html
+html
+    head
+        title= title
+        link(rel='stylesheet', href='/stylesheets/style.css')
+        link(rel='stylesheet prefetch', href='/bootstrap/css/bootstrap.min.css')
+        // link(rel='stylesheet prefetch', href='/materialize/css/materialize.min.css')
+        link(href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet")
+        script(src='/jquery/jquery-3.3.1.min.js')
+        script(src='/jquery/jquery.tablesorter.min.js')
+        script(src='/bootstrap/js/bootstrap.min.js')
+        // script(src='/materialize/js/materialize.min.js')
+        script.
+            function goBack() {
+                window.history.back();
+            }
+block content
+    body.login
+        div.container
+            div.row
+                div.account-wall
+                    h1.text-center.login-title Crie sua conta
+                    div
+                        img(class='profile-img', src='https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=120')
+                        br
+                        br
+                        -if(email_search){
+                            p(style="color: red") E-mail já cadastrado
+                        - }  
+                        form(class='form-signin', action='/signup', method='POST')
+                            .form-group
+                                input(type='text', name='nome' class='form-control', placeholder='Nome*', required, autofocus)
+                                input(type='email', name='email' class='form-control', placeholder='Email*', required)
+                                input(type='password', name='password' class='form-control', placeholder='Senha*', required)
+                                button#submitSignup(class='btn btn-lg btn-info btn-block', type='submit' ) Criar
+                                span.clearfix
+                            br
+                        a(href='/login', class='text-center new-account') Já possui conta
+                        #message
+                        if message
+                            h1.text-center.error-message #{message}

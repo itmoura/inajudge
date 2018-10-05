@@ -3,38 +3,46 @@ extends ../layout
 block content
     .container
         .row
-            h1 Problema #{title} - #{problema.letra}
-            .col-md-2.pull-right
-                div.topo.topo2
-                    i.large.material-icons.face face
+            .col-md-2
             .col-md-10
-                p Descrição
-                .fundinho
-                    h4 #{problema.descricao}
-            .col-md-10
-                p Entrada
-                .fundinho
-                    h4 #{problema.txt_entrada}
-            .col-md-10
-                p Saída
-                .fundinho
-                    h4 #{problema.txt_saida}
-            .col-md-10
-                p Exemplo de Entrada
-                .fundinho
-                    h4 #{problema.exp_entrada}
-            .col-md-10
-                p Exemplo de saída
-                .fundinho
-                    h4 #{problema.exp_saida}
-           
-            .col-md-10
-                p Enviar arquivo
-                form.form-group(action='/submit/code', method='post', enctype="multipart/form-data")
-                    input.form-control(type='hidden', name='id_problem', value=""+problema._id, required)
-                    input.form-control(type='hidden', name='name_problem', value=""+problema.nome, required)
-                    input.form-control(type='hidden', name='id_contest', value=""+problema.id_competition, required)
-                    input#arquivoInput.form-control(type='file', name='problem', required)
+                .col-md-10
+                    h3 #{problema.letra} - Problema #{title}
+                        //- i.large.material-icons.face(style="margin-left: 15px;") face
+                .col-md-10
                     br
-                    button.btn.btn-primary.col-md-12(type="submit") Enviar
+                    p #{problema.descricao}
+                .col-md-10.ent
+                    h4 Entrada
+                    p #{problema.txt_entrada}
+                .col-md-10.ent
+                    h4 Saída
+                    p #{problema.txt_saida}
+                .col-md-10
+                    h4 Exemplo de Entrada
+                        button.btn(data-clipboard-action='copy', data-clipboard-target='#entrada' style="margin-left: 15px;") Copy
+                    textarea#entrada(name="entrada", cols="30", rows="8") #{problema.exp_entrada}
+                .col-md-10
+                    h4 Exemplo de saída
+                    .fundinho
+                        p #{problema.exp_saida}
+            //- .col-md-10
+            //-     p Enviar arquivo
+            //-     form.form-group(action='/submit/code', method='post', enctype="multipart/form-data")
+            //-         input.form-control(type='hidden', name='id_problem', value=""+problema._id, required)
+            //-         input.form-control(type='hidden', name='name_problem', value=""+problema.nome, required)
+            //-         input.form-control(type='hidden', name='id_contest', value=""+problema.id_competition, required)
+            //-         input#arquivoInput.form-control(type='file', name='problem', required)
+            //-         br
+            //-         button.btn.btn-primary.col-md-12(type="submit") Enviar
     block addItem
+    script(src='/javascripts/clipboard.min.js')
+    script.
+        var clipboard = new ClipboardJS('.btn');
+        clipboard.on('success', function(e) {
+            console.log(e);
+        });
+
+        clipboard.on('error', function(e) {
+            console.log(e);
+        });
+    

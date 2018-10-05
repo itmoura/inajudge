@@ -23,7 +23,6 @@ module.exports = function(app) {
 				var hora_atual = moment().format('LT'); 
 				res.render('competition/index', { title: 'Veja todas as competições', listContests: data, moment: moment, data_atual: data_atual, user: req.user, hora_atual: hora_atual, string: S });
 			});
-			// global.id = req.user._id;
 		},
 		valida_senha: function(req,res){
 			var senha = req.body.senha;
@@ -33,7 +32,8 @@ module.exports = function(app) {
 					console.log('Erro na procura da competicao (entrada da sala): '+err);
 				}
 				if(data.senha == senha){
-					Users.findOne(req.user._id, function(err, data2){
+					var id_user = req.user._id;
+					Users.findOne(id_user, function(err, data2){
 						if (err) {
 							console.log(err);
 						} else {
@@ -53,7 +53,17 @@ module.exports = function(app) {
 									if (err) {
 										console.log(err);
 									} else{
-										res.sendStatus(200).send();
+										Contest.findOne(data._id, function(err, dataContest){
+											var modelContest = dataContest;
+											modelContest.competidores = modelContest.competidores + ',' + id_user;
+											modelContest.save(function(err){
+												if (err) {
+													console.log(err);
+												} else{
+													res.sendStatus(200).send();
+												}
+											});
+										});
 									}
 								});
 							} else {
@@ -211,11 +221,15 @@ module.exports = function(app) {
 					res.render('competition/submit', {title: data.nome, problema: data});
 				}
 			});			
+		},  
+		cad_problema: function(req,res) {
+			res.render('competition/problema', { title: 'Cadastre problema', id_competition: req.params.id });
 	  	},
 		create: function(req,res) {
 	  		res.render('competition/create', { title: 'Crie sua competição' });
 		},
 		submitProblem: function(req, res, next){
+			var cont_sub = 0;
 			var filename = req.file.filename;
 			var id_room = req.body.id_room;
 			var id_problem = req.body.id_problem;
@@ -230,37 +244,40 @@ module.exports = function(app) {
 			model.hora_atual = moment().format('LT'); 
 			model.hora_data = moment().format();
 			model.filename = filename;
-			Problem.findOne({ _id: id_problem }, function(err, getLetra){
-				if (err) {
-					console.log('Deu erro em room'+err);
-				}
-				console.log(getLetra.letra);
-				model.letra_problem = getLetra.letra;
-				model.save(function(err){
+			Contest.findById(id_room, function(err, data_contest){
+				var model_contest = data_contest;
+				cont_sub = data_contest.cont_sub + 1;
+				model_contest.cont_sub = cont_sub;
+				model_contest.save(function(err){
 					if (err) {
 						console.log(err);
-						res.write('<script>alert("Falha ao enviar!"); window.location="../"</script>');
 					}
-					else {
-						// Problem.findOne().sort({'_id': -1}).exec(function(err, data){
-						// 	if (err) {
-						// 		console.log('Deu erro em room '+err);
-						// 	} 
-						// 	else {
-						model.resposta = Math.floor(Math.random() * (1 - 0 + 1) + 0);
+					model.cont_sub = cont_sub;
+					Problem.findOne({ _id: id_problem}, function(err, getLetra){
+						if (err) {
+							console.log('Deu erro em room'+err);
+						}
+						model.letra_problem = getLetra.letra;
 						model.save(function(err){
 							if (err) {
 								console.log(err);
 								res.write('<script>alert("Falha ao enviar!"); window.location="../"</script>');
-							} else {
-								res.redirect('http://localhost:4000/competition/room/'+id_room);
+							}
+							else {
+								model.resposta = Math.floor(Math.random() * (1 - 0 + 1) + 0);
+								model.save(function(err){
+									if (err) {
+										console.log(err);
+										res.write('<script>alert("Falha ao enviar!"); window.location="../"</script>');
+									} else {
+										res.redirect('/competition/room/'+id_room);
+									}
+								});
 							}
 						});
-						// 	}
-						// });	
-					}
+					  });
 				});
-	  		});
+			});
 		},
 		create_room: function(req, res){
 			var model = new Contest;
@@ -272,6 +289,9 @@ module.exports = function(app) {
 			model.titulo = req.body.title;
 			model.descricao = req.body.description;
 			model.liberado = false;
+			model.cont_sub = 0;
+			model.trava_placar = req.body.trava_placar;
+			model.competidores = 1;
 			model.save(function(err){
 				if (err) {
 					console.log(err);
@@ -417,7 +437,7 @@ module.exports = function(app) {
 					res.write('<script>alert("Falha ao cadastrar!"); window.location="../"</script>');
 				}				
 				Problem.findOne().sort({'_id': -1}).exec(function(err, data){
-					//-fs.createReadStream('./public/contest/'+req.file.filename).pipe(unzip.Extract({ path: './public/contest/'+data.id_competition+'/'+data._id}));
+					// -fs.createReadStream('./public/contest/'+req.file.filename).pipe(unzip.Extract({ path: './public/contest/'+data.id_competition+'/'+data._id}));
 					res.redirect('/competition/room/'+data.id_competition);
 				});
 	  		});

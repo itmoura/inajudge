@@ -31,18 +31,18 @@ block content
                         .col-md-1.floatLeft
                         a.col-md-3#nav-acontecendo-tab.nav-item.nav-link.active(data-toggle='tab', href='#nav-acontecendo', role='tab', data-target='#nav-acontecendo', aria-target='nav-acontecendo', aria-selected='true')
                             .card.danger.default
-                                div.topo
-                                    i.large.material-icons.face insert_emoticon
+                                //- div.topo
+                                //-     i.large.material-icons.face insert_emoticon
                                 p Acontecendo
                         a.col-md-3#nav-proximas-tab.nav-item.nav-link(data-toggle='tab', href='#nav-proximas', role='tab', data-target='#nav-proximas', aria-target='nav-proximas', aria-selected='false')
                             .card.warning.default
-                                div.topo
-                                    i.large.material-icons.face insert_emoticon
+                                //- div.topo
+                                //-     i.large.material-icons.face insert_emoticon
                                 p Próximas
                         a.col-md-3#nav-acabadas-tab.nav-item.nav-link(data-toggle='tab', href='#nav-acabadas', role='tab', data-target='#nav-acabadas', aria-target='nav-acabadas', aria-selected='false')
                             .card.acabadas.default
-                                div.topo
-                                    i.large.material-icons.face insert_emoticon
+                                //- div.topo
+                                //-     i.large.material-icons.face insert_emoticon
                                 p Acabadas
                         .col-md-1.floatLeft
                     #nav-tabContent.tab-content
@@ -59,7 +59,7 @@ block content
                                 tbody
                                     each lista, i in listContests
                                         - if(moment(lista.data_inicio).format() <= moment().format() && moment(lista.data_fim).format() >= moment().format())
-                                            - var cor = "danger"
+                                            - var cor = "success"
                                             - var quebra_competicao = string(user.competicoes).parseCSV(",");
                                             - var qnt = quebra_competicao.length;
                                             - var link = null;
@@ -83,9 +83,13 @@ block content
                                                         a(href="/competition/room/"+lista._id) #{lista.nome_autor}
                                                     td 
                                                         a(href="/competition/room/"+lista._id) 
-                                                            i.large.material-icons lock_open
+                                                            - if(lista.senha == ""){
+                                                                i.large.material-icons lock_open
+                                                            - } else { 
+                                                                i.large.material-icons lock_outline
+                                                            - }
                                             else
-                                                tr(class='table-'+cor, data-toggle="modal" data-target='#'+lista._id)
+                                                tr(class='table-white', data-toggle="modal" data-target='#'+lista._id)
                                                     th(scope='row') #{i}
                                                     td 
                                                         p #{lista.titulo}
@@ -97,8 +101,11 @@ block content
                                                         p #{lista.nome_autor}
                                                     td 
                                                         p
-                                                            i.large.material-icons lock_outline  
-
+                                                            - if(lista.senha == ""){
+                                                                i.large.material-icons lock_open
+                                                            - } else { 
+                                                                i.large.material-icons lock_outline
+                                                            - }
                                             .modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true', id=''+lista._id)
                                                 .modal-dialog(role='document')
                                                     .modal-content
@@ -116,7 +123,7 @@ block content
                                                                 input.form-control.col-md-4.senha(type='text', name='senha', placeholder="Senha")
                                                                 input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)                                      
                                                                 br
-                                                            p criado por #{lista.autor}
+                                                            p#erroSenha(style="display: none; color: red;") Senha incorreta     
                                                         .modal-footer
                                                             button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
                                                             button.btn.btn-primary(type='button') Entrar
@@ -139,6 +146,7 @@ block content
                                                                                 window.location.href = ("/competition/room/"+_id);
                                                                             else {
                                                                                 $(".senha").val("");
+                                                                                document.getElementById("erroSenha").style.display = "block";
                                                                             }
                                                                         }
                                                                     });
@@ -156,7 +164,6 @@ block content
                                     th(scope='col') Acesso
                                 tbody
                                     each lista, i in listContests
-                                        //- p #{moment(lista.data_inicio).format('DD/MM HH:mm')} > #{moment().format('DD/MM HH:mm')}
                                         if(moment(lista.data_inicio).format() > moment().format())
                                             - var cor = "warning"
                                             - var quebra_competicao = string(user.competicoes).parseCSV(",");
@@ -182,9 +189,13 @@ block content
                                                         a(href="/competition/room/"+lista._id) #{lista.nome_autor}
                                                     td 
                                                         a(href="/competition/room/"+lista._id) 
-                                                            i.large.material-icons lock_open
+                                                            - if(lista.senha == ""){
+                                                                i.large.material-icons lock_open
+                                                            - } else { 
+                                                                i.large.material-icons lock_outline
+                                                            - }
                                             else
-                                                tr(class='table-'+cor, data-toggle="modal" data-target='#'+lista._id)
+                                                tr(class='table-white', data-toggle="modal" data-target='#'+lista._id)
                                                     th(scope='row') #{i}
                                                     td 
                                                         p #{lista.titulo}
@@ -196,7 +207,11 @@ block content
                                                         p #{lista.nome_autor}
                                                     td 
                                                         p
-                                                            i.large.material-icons lock_outline
+                                                            - if(lista.senha == ""){
+                                                                i.large.material-icons lock_open
+                                                            - } else { 
+                                                                i.large.material-icons lock_outline
+                                                            - }
 
                                             .modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true', id=''+lista._id)
                                                 .modal-dialog(role='document')
@@ -213,13 +228,14 @@ block content
                                                             else
                                                                 p Essa sala possui senha, insira a senha abaixo e entre
                                                                 input.form-control.col-md-4.senha(type='text', name='senha', placeholder="Senha")
-                                                                input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)                                      
+                                                                input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id) 
+                                                            p#erroSenha(style="display: none;") Senha incorreta                                    
                                                                 br
-                                                            p criado por #{lista.autor}
                                                         .modal-footer
                                                             button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
                                                             button.btn.btn-primary(type='button') Entrar
                                                             script.
+
                                                                 $(".btn-primary").click(function(){
                                                                     var _id = $(this).parent().parent().find('._id').val();                                            
                                                                     var senha = $(this).parent().parent().find('.senha').val();
@@ -238,6 +254,7 @@ block content
                                                                                 window.location.href = ("/competition/room/"+_id);
                                                                             else {
                                                                                 $(".senha").val("");
+                                                                                document.getElementById("erroSenha").style.display = "block";
                                                                             }
                                                                         }
                                                                     });
@@ -256,7 +273,7 @@ block content
                                 tbody
                                     each lista, i in listContests
                                         if(lista.data_fim < moment().format())
-                                            - var cor = "success"
+                                            - var cor = "danger"
                                             - var quebra_competicao = string(user.competicoes).parseCSV(",");
                                             - var qnt = quebra_competicao.length;
                                             - var link = null;
@@ -280,9 +297,13 @@ block content
                                                         a(href="/competition/room/"+lista._id) #{lista.nome_autor}
                                                     td 
                                                         a(href="/competition/room/"+lista._id) 
-                                                            i.large.material-icons lock_open
+                                                            - if(lista.senha == ""){
+                                                                i.large.material-icons lock_open
+                                                            - } else { 
+                                                                i.large.material-icons lock_outline
+                                                            - }
                                             else
-                                                tr(class='table-'+cor, data-toggle="modal" data-target='#'+lista._id)
+                                                tr(class='table-white', data-toggle="modal" data-target='#'+lista._id)
                                                     th(scope='row') #{i}
                                                     td 
                                                         p #{lista.titulo}
@@ -294,7 +315,11 @@ block content
                                                         p #{lista.nome_autor}
                                                     td 
                                                         p
-                                                            i.large.material-icons lock_outline        
+                                                            - if(lista.senha == ""){
+                                                                i.large.material-icons lock_open
+                                                            - } else { 
+                                                                i.large.material-icons lock_outline
+                                                            - }    
 
                                             .modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true', id=''+lista._id)
                                                 .modal-dialog(role='document')
@@ -313,7 +338,6 @@ block content
                                                                 input.form-control.col-md-4.senha(type='text', name='senha', placeholder="Senha")
                                                                 input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)                                      
                                                                 br
-                                                            p criado por #{lista.autor}
                                                         .modal-footer
                                                             button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
                                                             button.btn.btn-primary(type='button') Entrar

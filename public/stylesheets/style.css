@@ -40,14 +40,14 @@ nav .container a {color: #ffffff;}
 /* COMPETIÇÃO */
 	/* INDEX */
 		.escolha {margin-top: 15px;}
-		.escolha .default {font-size: 24px; text-align: center; text-transform: uppercase;}
+		.escolha .default {font-size: 24px; text-align: center; text-transform: uppercase; padding-bottom: 5px;}
 		.escolha .default i {font-size: 32px;}
-		.escolha .danger {color: red; border: 1px solid red !important;}
-		.escolha .danger i {color: red;}
-		.escolha .warning {color: gold; border: 1px solid gold !important;}
-		.escolha .warning i {color: gold;}
-		.escolha .acabadas {color: cornflowerblue; border: 1px solid cornflowerblue !important;}
-		.escolha .acabadas i {color: cornflowerblue;}
+		.escolha .danger {color: green; border: 1px solid green !important;}
+		.escolha .danger i {color: green;}
+		.escolha .warning {color: #ffa500; border: 1px solid #ffa500 !important;}
+		.escolha .warning i {color: #ffa500;}
+		.escolha .acabadas {color: red; border: 1px solid red !important;}
+		.escolha .acabadas i {color: red;}
 		#mytable {margin-top: 15px;}
 		#mytable3 {margin-top: 15px;}
 		#mytable2 {margin-top: 15px;}
@@ -66,6 +66,8 @@ nav .container a {color: #ffffff;}
   	/* Index */
 		.card {border: 2px solid #00B7FF; border-radius: 20px; padding: 20px;}
 	/* SALA */
+		#data_reduzindo {font-size: 38px; text-align: center; margin-top: -40px;}
+		.minutosRes {text-align: center;}
 		.sendProblem select {margin-bottom: 10px;}
 		.sendProblem button {margin-top: 10px; float: right;}
 		.topo {position: relative; float: right; text-align: right}
@@ -80,10 +82,43 @@ nav .container a {color: #ffffff;}
 		.falha {border: 1px solid tomato !important; color: tomato;}
 		.falha .face {color: tomato;}
 		.falha:hover {color: tomato;}
+		
+		.tpBallon {margin: 0 auto; border-radius: 35px; padding-top: 2px; width: 30px; height: 30px; color: #ffffff} 
+		.tpBallonA {margin: 0 auto; border-radius: 35px; padding: 6px 10px; color: #ffffff; } 
+		a.tpBallonA:hover {
+			color: #fff;
+		}
+
+		/* TAB 2 PLACAR */
+			.myTableTable {counter-reset: rowNum;}			
+			.myTableTable tbody tr {
+				position: relative;
+				counter-increment: rowNum;
+			}			
+			.myTableTable thead .contLinha::before  {
+				content: 'a';
+			}			
+			.myTableTable tbody .contLinha::before {
+				content: counter(rowNum);
+				left: -2em;
+			}
+			.myTableTable thead tr th {text-align: center;}
+			.myTableTable thead tr th:nth-child(1) {text-align: left;}
+			.myTableTable thead tr th:nth-child(2) {text-align: left;}
+			/* .myTableTable tbody tr {height: 15px !important;} */
+			.myTableTable tbody tr th {width: 40px; padding-top: 20px; padding-bottom: 20px; text-align: center;}
+			.myTableTable tbody tr th.ulti {font-weight: normal;}
+			.myTableTable tbody tr td {text-align: center; width: 90px; border-right: 2px solid #fff; padding-top: 5px; padding-bottom: 5px;}
+			.myTableTable tbody tr td:nth-child(2) {text-align: left; width: auto; padding-top: 20px; padding-bottom: 20px;}
+			.myTableTable td.acerto {background-color: green; color: #ffffff; text-align: center;} 
+			.myTableTable td.erro {background-color: tomato; color: #ffffff; text-align: center;} 
+			.myTableTable td p {margin: 0;}
 	/* PROBLEMA */
 		.topo2 {margin-top: 15px;}
-		.fundinho {background-color: lightslategrey; width: 100%; min-height: 80px; border-radius: 10px; color: #fff; padding-left: 10px;}
+		h3 {text-align: center !important;}
+		.fundinho,textarea {background-color: lightslategrey; width: 100%; min-height: 80px; border-radius: 10px; color: #fff; padding-left: 10px; padding-top: 5px;}
 	/* ESCLARECIMENTO */
 		.esclarecimento {margin-top: 15px;}
 		.esclarecimento span {color: darkgrey;}
 		.esclarecimento .letraProblema {right: 20px; position: absolute;}
+	

@@ -40,6 +40,7 @@ module.exports = function(app){
 	app.post('/edt_competicao', competition.editar_room);
 	app.get('/delete_competicao/:id', require('connect-ensure-login').ensureLoggedIn(), competition.deletar_room);
 	app.get('/atualizar_competicao/:id/:info', require('connect-ensure-login').ensureLoggedIn(), competition.atualizar_competicao);
+	app.get('/cad_problema/:id', require('connect-ensure-login').ensureLoggedIn(), competition.cad_problema);	
 	// Upload input e outpus problems
 	app.post('/upload_problem', upload.single('arquivo'), competition.upload_problem);
 	// Validando a senha para entrar na sala
@@ -54,5 +55,7 @@ module.exports = function(app){
 	/* ESCLARECIMENTO */
 	app.post('/esclarecimento', competition.esclarecimento);
 	app.post('/respesclarecimento/:id', competition.respesclarecimento);
+	app.post('/respesclarecimento/:id', competition.respesclarecimento);
+
 	
 };

@@ -5,13 +5,15 @@ module.exports = function(){
 
 	var contests = new Schema({
 		id_autor: String,
-		liberado: Boolean,
 		nome_autor: String,
 		senha: String,
 		titulo: String,
 		data_inicio: String,
 		data_fim: String,
-		descricao: String
+		descricao: String,
+		cont_sub: Number,
+		trava_placar: Number,
+		competidores: String
 	});
 
 	return mongoose.model('Contests', contests);

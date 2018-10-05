@@ -1,0 +1,45 @@
+extends ../layout
+
+block content
+    .container
+        .row(style="margin-bottom: 15px;")
+            h1= title
+        .row
+            form.form-group(action='/upload_problem/', method='post', enctype="multipart/form-data" style="width: 100%;")
+                input(type="hidden", name="id_competition", value=id_competition)
+                label(for="nome") Nome do problema
+                input.form-control(type='text', name='nome', id="nome")
+                br
+                label(for="letra") Letra
+                input.form-control(type='text', name='letra', id="letra")
+                br
+                label(for="cor") Cor: (exemplo: #00000)
+                input.form-control(type='text', name='cor', id="cor")
+                br
+                label(for="tempo") Tempo Limite
+                input.form-control(type='number', name='limit_time' id="tempo")
+                br
+                label(for="descricao") Descrição
+                textarea.form-control(type='text', name='description', id="descricao" cols="30", rows="10", required)
+                br
+                label(for="txt_entrada") Texto da Entrada
+                textarea.form-control(type='text', name='txt_entrada', id="txt_entrada" cols="30", rows="10", required)
+                br
+                label(for="txt_saida") Texto da Saída
+                textarea.form-control(type='text', name='txt_saida', id="txt_saida" cols="30", rows="10", required)                                                                            
+                br
+                label(for="exp_entrada") Exemplo de Entrada
+                textarea.form-control(type='text', name='exp_entrada', id="exp_entrada" cols="30", rows="10", required)                                                                            
+                br
+                label(for="exp_saida") Exemplo de Saída
+                textarea.form-control(type='text', name='exp_saida', id="exp_saida" cols="30", rows="10", required)                                                                            
+                br
+                label(for="arquivo") Arquivo
+                input.form-control(id="arquivo" type="file", name="arquivo", required)
+                br
+                //- p criado por #{user.nome}
+                //- button.btn.btn-secondary.btn-large(type='button', data-dismiss='modal') Cancelar
+                button.btn.btn-primary(type='submit' style="width: 100%;") Finzalizar
+        br
+        br
+block addItem

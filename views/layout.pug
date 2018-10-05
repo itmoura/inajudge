@@ -1,5 +1,5 @@
 doctype html
-html
+html(lang="pt-br")
 	head
 		title= title
 		link(rel='stylesheet', href='/stylesheets/style.css')
@@ -21,8 +21,17 @@ html
 				.container
 					.navbar-header
 						.navbar-brand
-							a(href='http://localhost:4000/competition/')
-								p INATEL
+							a(href='/competition/')
+								p(style="margin-top: 15px;") INATEL
+					.col-md-3.floatRight(style="margin-top: 15px;")
+						.col-md-6.floatLeft
+							a(href="")
+								i.material-icons.floatLeft account_circle
+								p.floatLeft(style="margin-left: 10px;") Perfil
+						.col-md-6.floatLeft
+							a(href="/logout")
+								i.material-icons.floatLeft power_settings_new
+								p.floatLeft(style="margin-left: 10px;") Sair
 		block content
 	rodape
 		.rodape

@@ -140,6 +140,11 @@ function(req, res){
   res.render('login');
 });
 
+app.get('/signup',
+function(req, res){
+  res.render('signup');
+});
+
 app.post('/login',
 passport.authenticate('local', { failureRedirect: '/login' }),
 function(req, res) {
@@ -147,17 +152,28 @@ function(req, res) {
   global.id_competidorGlobal = req.user._id;  
 });
 
-// var Usuarios = app.models.users;
-// var model = new Usuarios;
-// model.nome = "Usuario 3";
-// model.email = "user3";
-// model.senha = createHash("123");
-// model.competicoes = "1";
-// model.save(function(err){
-//   if (err) {
-//     console.log(err);
-//   }	
-// });
+app.post('/signup', function(req, res) {
+  var Usuarios = app.models.users;
+	Usuarios.findOne({'email': req.body.email}, function(err, data){
+		if(data != null){
+			if (data.email == req.body.email)
+				res.render('signup', { email_search: 1 });
+		} else {
+			var model = new Usuarios;
+			model.nome = req.body.nome;
+			model.email = req.body.email;
+			model.senha = createHash(req.body.password);
+			model.competicoes = 1;
+			model.save(function(err){
+				if (err) {
+					console.log(err);
+				} else {
+					res.redirect('/login');
+				}
+			});
+		}
+	});
+});
 
 app.get('/logout',
 function(req, res){
