@@ -7,7 +7,6 @@ var logger = require('morgan');
 // Connect
 var mongoose = require('mongoose');
 
-
 var multer = require('multer'); //
 var session = require('cookie-session'); //
 var bCrypt = require('bcrypt-nodejs');
@@ -36,6 +35,7 @@ function decrypt(text){
   dec += decipher.final('utf8');
   return dec;
 }
+
 // Connect to Database
 mongoose.connect('mongodb://onlinejudge:novaSenha123@ds163382.mlab.com:63382/onlinejudgeinatel', function(err){
   if(err) {

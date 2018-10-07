@@ -135,7 +135,7 @@ block content
                             -var data_inicio = moment(hora_inicio).format();
                             -var hora_fim = moment(listaCompetiton.data_fim).format();
                             -var data_fim = moment(hora_fim).format();
-                            each competidor, i in rank 
+                            each competidor, i in rank
                                 tr 
                                     th(scope='row', class="contLinha")
                                     td #{competidor.nome_competidor[0]} 
@@ -149,20 +149,20 @@ block content
                                         - var penalizacao = 0
                                         - var erro = 0
                                         - var acerto = 0
-                                        -for(var i=0; i < submissionsCount; i++){
-                                            -var subProblemId = competidor.id_problem[i];
+                                        -for(var k = 0; k < submissionsCount; k++){
+                                            -var subProblemId = competidor.id_problem[k];
                                             //- TRANSFORMA HORA DE ENVIO EM MINUTOS
-                                            -var data_envio = moment(competidor.hora_data[i]).format();
-                                            -var diff = moment(data_envio).diff(data_inicio, 'minutes');
+                                            -var data_envio = moment(competidor.hora_data[k]).format();
                                             -var diff2 = moment(data_fim).diff(data_envio, 'minutes');
-                                            -if(subProblemId == problemId && competidor.resposta[i] == '0' && diff2 >= listaCompetiton.trava_placar){
+                                            -if(subProblemId == problemId && competidor.resposta[k] == '0' && diff2 >= listaCompetiton.trava_placar){
                                                 - erro++;
                                                 -penalizacao = penalizacao + 20;
                                             - }
-                                            -else if(subProblemId == problemId && competidor.resposta[i] == '1' && diff2 >= listaCompetiton.trava_placar){
+                                            -if(subProblemId == problemId && competidor.resposta[k] == '1' && diff2 >= listaCompetiton.trava_placar){
+                                                -var diff = moment(data_envio).diff(data_inicio, 'minutes');
                                                 -acerto++;
                                                 -acertos++;
-                                                -acertou = true
+                                                -acertou = true;
                                                 -tempoAcumulado = tempoAcumulado + diff + penalizacao;
                                                 td.acerto #{erro+acerto}
                                                     p #{diff}
