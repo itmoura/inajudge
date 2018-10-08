@@ -5,6 +5,6 @@ int main()
 {
     int x, y;
     cin >> x >> y; 
-    cout << "Soma: aa " << y << endl;
+    cout << "Soma: " << x+y << endl;
     return 0;
 }

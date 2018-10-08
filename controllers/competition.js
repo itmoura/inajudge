@@ -1,4 +1,5 @@
 var fs = require('fs');
+var readline = require('readline');
 var unzip = require('unzip');
 var moment = require('moment');
 var S = require('string');
@@ -233,33 +234,46 @@ module.exports = function(app) {
 			function judge(){
 				var aceitacao = 0;
 				var recusado = 0;
-				
-				for(var ij = 1; ij <= 2; ij++){
-					cmd.run('jugamento.exe < ./public/contest/'+id_room+'/'+id_problem+'/in'+ij+'.txt > ./public/respostas/'+id_competidor+'-'+id_problem+'-'+ij+'.txt' );
-					
-					fs.readFile('./public/respostas/'+id_competidor+'-'+id_problem+'-'+ij+'.txt', 'utf-8', function (err, resultado) {
+				var qnt = 2;
+				for(var ij = 1; ij <= qnt; ij++){
+					cmd.run('jugamento.exe < ./public/contest/'+id_room+'/'+id_problem+'/in'+ij+'.txt > ./public/respostas/'+id_sub+'-'+ij+'.txt' );
+					for(var k = 0; k < 100000000; k++){
+						var x = k;
+					}
+					fs.readFile('./public/respostas/'+id_sub+'-'+ij+'.txt', 'utf-8', function (err, resultado) {
 						if (err) {
 							console.log(err);
 						} else {
+							//- TIME
+							for(var k = 0; k < 100000000; k++){
+								var x = k;
+							}
+							// console.log("teste "+ij+": "+resultado);
 							fs.readFile('./public/contest/'+id_room+'/'+id_problem+'/out'+ij+'.txt', 'utf-8', function (err2, esperado) {
 								if (err2) {
 									console.log(err2);
 								} else {
-									// fs.unlinkSync('jugamento.exe');
+									console.log("Resultado: "+resultado);
+									console.log("Esperado: "+esperado);
 									// global.esp = esperado;
-									// if(resultado == esperado){
-									// 	console.log("codigo Aceito");
-									// 	aceitacao = ij;
-									// } else {
-									// 	console.log("codigo nao aceito");
-									// 	recusado = ij;
-									// 	ij = 3;
-									// }
-									console.log(resultado);
-									console.log(esperado);
-
+									if(resultado == esperado){
+										console.log("codigo Aceito");
+										aceitacao = ij;
+									} else {
+										console.log("codigo nao aceito");
+										recusado = ij;
+										ij = qnt + 1;
+										// fs.unlinkSync('jugamento.exe');
+									}
+									if(ij == qnt){
+										// fs.unlinkSync('jugamento.exe');
+									}
 								}
 							});
+							//- TIME
+							for(var k = 0; k < 1000000; k++){
+								var x = k;
+							}
 						}
 					});
 				}
@@ -280,6 +294,7 @@ module.exports = function(app) {
 			model.hora_atual = moment().format('LT'); 
 			model.hora_data = moment().format();
 			model.filename = filename;
+			var id_sub = model._id;
 			Contest.findById(id_room, function(err, data_contest){
 				var model_contest = data_contest;
 				cont_sub = data_contest.cont_sub + 1;
