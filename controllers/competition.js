@@ -4,6 +4,8 @@ var unzip = require('unzip');
 var moment = require('moment');
 var S = require('string');
 var cmd = require('node-cmd');
+var Promise = require('bluebird');
+const getAsync = Promise.promisify(cmd.get, { multiArgs: true, context: cmd })
 
 
 module.exports = function(app) {
@@ -232,11 +234,26 @@ module.exports = function(app) {
 		},
 		submitProblem: function(req, res, next){
 			function judge(){
-				var aceitacao = 0;
-				var recusado = 0;
 				var qnt = 2;
 				for(var ij = 1; ij <= qnt; ij++){
-					cmd.run('jugamento.exe < ./public/contest/'+id_room+'/'+id_problem+'/in'+ij+'.txt > ./public/respostas/'+id_sub+'-'+ij+'.txt' );
+					
+					console.time("queryTime");
+					getAsync('jugamento.exe < ./public/contest/'+id_room+'/'+id_problem+'/in'+ij+'.txt > ./public/respostas/'+id_sub+'-'+ij+'.txt').then(data => {
+						console.timeEnd("queryTime");
+						console.log('cmd data', data)
+					}).catch(err => {
+						console.log('cmd err', err)
+					})
+
+					// cmd.run('jugamento.exe < ./public/contest/'+id_room+'/'+id_problem+'/in'+ij+'.txt > ./public/respostas/'+id_sub+'-'+ij+'.txt',
+					// 	function(err, data, stderr){
+					// 		console.timeEnd("queryTime");
+					// 		if(err){
+					// 			console.log("erro: "+err)
+					// 		}
+					// 		console.log('the current working dir is : ',data)
+					// 	}
+					//  );
 					for(var k = 0; k < 100000000; k++){
 						var x = k;
 					}
@@ -271,7 +288,7 @@ module.exports = function(app) {
 								}
 							});
 							//- TIME
-							for(var k = 0; k < 1000000; k++){
+							for(var k = 0; k < 100000000; k++){
 								var x = k;
 							}
 						}

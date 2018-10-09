@@ -9,6 +9,7 @@
     "aggregate": "^0.1.0",
     "bcrypt-nodejs": "*",
     "body-parser": "*",
+    "bluebird": "*",
     "child_process": "^1.0.2",
     "connect-ensure-login": "*",
     "cookie-parser": "~1.4.3",
