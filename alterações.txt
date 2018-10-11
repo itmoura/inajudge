@@ -1,0 +1,2 @@
+Jugamento do primeiro caso está dando ruim
+QNT = quantidade dinamica de acordo com as IN

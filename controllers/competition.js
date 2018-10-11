@@ -235,25 +235,21 @@ module.exports = function(app) {
 		submitProblem: function(req, res, next){
 			function judge(){
 				var qnt = 2;
+				for(var k = 0; k < 100000000; k++){
+					var x = k;
+				}
 				for(var ij = 1; ij <= qnt; ij++){
 					
 					console.time("queryTime");
-					getAsync('jugamento.exe < ./public/contest/'+id_room+'/'+id_problem+'/in'+ij+'.txt > ./public/respostas/'+id_sub+'-'+ij+'.txt').then(data => {
-						console.timeEnd("queryTime");
-						console.log('cmd data', data)
-					}).catch(err => {
-						console.log('cmd err', err)
-					})
+					// getAsync('jugamento.exe < ./public/contest/'+id_room+'/'+id_problem+'/in'+ij+'.txt > ./public/respostas/'+id_sub+'-'+ij+'.txt').then(data => {
+					// 	console.timeEnd("queryTime");
+					// 	console.log('cmd data', data);
+					// }).catch(err => {
+					// 	console.log('cmd err', err);
+					// })
 
-					// cmd.run('jugamento.exe < ./public/contest/'+id_room+'/'+id_problem+'/in'+ij+'.txt > ./public/respostas/'+id_sub+'-'+ij+'.txt',
-					// 	function(err, data, stderr){
-					// 		console.timeEnd("queryTime");
-					// 		if(err){
-					// 			console.log("erro: "+err)
-					// 		}
-					// 		console.log('the current working dir is : ',data)
-					// 	}
-					//  );
+					cmd.run('jugamento.exe < ./public/contest/'+id_room+'/'+id_problem+'/in'+ij+'.txt > ./public/respostas/'+id_sub+'-'+ij+'.txt');
+					console.timeEnd("queryTime");
 					for(var k = 0; k < 100000000; k++){
 						var x = k;
 					}
@@ -265,13 +261,12 @@ module.exports = function(app) {
 							for(var k = 0; k < 100000000; k++){
 								var x = k;
 							}
-							// console.log("teste "+ij+": "+resultado);
+							console.log("teste "+ij+": "+resultado);
+								// console.log("testeeee");
 							fs.readFile('./public/contest/'+id_room+'/'+id_problem+'/out'+ij+'.txt', 'utf-8', function (err2, esperado) {
 								if (err2) {
 									console.log(err2);
 								} else {
-									console.log("Resultado: "+resultado);
-									console.log("Esperado: "+esperado);
 									// global.esp = esperado;
 									if(resultado == esperado){
 										console.log("codigo Aceito");
@@ -280,10 +275,9 @@ module.exports = function(app) {
 										console.log("codigo nao aceito");
 										recusado = ij;
 										ij = qnt + 1;
-										// fs.unlinkSync('jugamento.exe');
 									}
 									if(ij == qnt){
-										// fs.unlinkSync('jugamento.exe');
+										
 									}
 								}
 							});
@@ -294,6 +288,7 @@ module.exports = function(app) {
 						}
 					});
 				}
+				cmd.run('del jugamento.exe');
 				return -1;
 			}
 			var cont_sub = 0;
@@ -333,6 +328,9 @@ module.exports = function(app) {
 							}
 							else {
 								cmd.run('g++ ./public/resolutions/'+filename+' -o jugamento.exe');
+								for(var k = 0; k < 1000000000; k++){
+									var x = k;
+								}
 								model.resposta = judge();
 								model.save(function(err){
 									if (err) {

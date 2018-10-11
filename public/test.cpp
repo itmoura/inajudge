@@ -4,7 +4,10 @@ using namespace std;
 int main()
 {
     int x, y;
-    cin >> x >> y; 
-    cout << "Soma: " << x+y << endl;
+    cin >> x >> y;
+    for(int i = 0; i < 10; i++){
+        cout << i << endl;
+    }
+    cout << "Soma12: " << x+y << endl;
     return 0;
 }
