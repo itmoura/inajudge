@@ -1,0 +1,1 @@
+Start-Process -FilePath "./test.exe" -RedirectStandardInput "./input.txt" -RedirectStandardOutput "./output.txt" -RedirectStandardError "./outputerror.txt" -Wait -WindowStyle Minimized

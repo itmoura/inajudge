@@ -247,3 +247,8 @@ block content
         //-         $('#teste').append('teste');
         //-     //- });
         //- }, 1000);
+
+
+
+
+jugamento.exe < 15 20 > ./public/respostas/out.txt

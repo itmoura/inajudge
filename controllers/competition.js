@@ -5,7 +5,8 @@ var moment = require('moment');
 var S = require('string');
 var cmd = require('node-cmd');
 var Promise = require('bluebird');
-const getAsync = Promise.promisify(cmd.get, { multiArgs: true, context: cmd })
+const getAsync = Promise.promisify(cmd.get, { multiArgs: true, context: cmd });
+const PowerShell = require("powershell");
 
 
 module.exports = function(app) {
@@ -235,60 +236,101 @@ module.exports = function(app) {
 		submitProblem: function(req, res, next){
 			function judge(){
 				var qnt = 2;
-				for(var k = 0; k < 100000000; k++){
-					var x = k;
+				for(var i = 0; i < 10000000; i++){
 				}
+				var aceitacao = 0;
+				var recusado = 0;
 				for(var ij = 1; ij <= qnt; ij++){
-					
-					console.time("queryTime");
-					// getAsync('jugamento.exe < ./public/contest/'+id_room+'/'+id_problem+'/in'+ij+'.txt > ./public/respostas/'+id_sub+'-'+ij+'.txt').then(data => {
-					// 	console.timeEnd("queryTime");
-					// 	console.log('cmd data', data);
-					// }).catch(err => {
-					// 	console.log('cmd err', err);
-					// })
-
-					cmd.run('jugamento.exe < ./public/contest/'+id_room+'/'+id_problem+'/in'+ij+'.txt > ./public/respostas/'+id_sub+'-'+ij+'.txt');
-					console.timeEnd("queryTime");
-					for(var k = 0; k < 100000000; k++){
-						var x = k;
-					}
-					fs.readFile('./public/respostas/'+id_sub+'-'+ij+'.txt', 'utf-8', function (err, resultado) {
-						if (err) {
-							console.log(err);
+					// $data1 = Get-Date -format ss
+					let ps = new PowerShell
+					(`
+						$data1 = Get-Date -format fff
+						$data1 = 999 - $data1
+						$proc = Start-Process -FilePath './public/jugamento.exe' -RedirectStandardInput './public/contest/`+id_room+`/`+id_problem+`/in`+ij+`.txt' -RedirectStandardOutput './public/respostas/`+id_sub+`-`+ij+`.txt' -PassThru -Wait -WindowStyle Maximized
+						$timeouted = 4
+						$proc | Wait-Process -Timeout 1 -ErrorAction SilentlyContinue -ErrorVariable timeouted 
+						$data2 = Get-Date -format fff
+						$data2 = 999 - $data2
+						$tempo = $data1 - $data2
+						if ($timeouted){
+							echo 0
+							$proc.Kill()
 						} else {
-							//- TIME
-							for(var k = 0; k < 100000000; k++){
-								var x = k;
-							}
-							console.log("teste "+ij+": "+resultado);
-								// console.log("testeeee");
-							fs.readFile('./public/contest/'+id_room+'/'+id_problem+'/out'+ij+'.txt', 'utf-8', function (err2, esperado) {
-								if (err2) {
-									console.log(err2);
-								} else {
-									// global.esp = esperado;
-									if(resultado == esperado){
-										console.log("codigo Aceito");
-										aceitacao = ij;
-									} else {
-										console.log("codigo nao aceito");
-										recusado = ij;
-										ij = qnt + 1;
-									}
-									if(ij == qnt){
-										
-									}
-								}
-							});
-							//- TIME
-							for(var k = 0; k < 100000000; k++){
-								var x = k;
-							}
+							echo `+ij+`
+						}
+					`);
+					// Clear-Content -Path './public/respostas/`+id_sub+`-`+ij+`.txt' -Force
+					// Add-Content -Path './public/respostas/error-`+id_sub+`-`+ij+`.txt' -Value 1
+					// $data2 = Get-Date -format ss
+					// 	$tempo = $data2 - $data1
+					// ps.on("error", err => {
+					// 	console.error(err);
+					// });					 
+					// // Stdout
+					// ps.on("output", data => {
+					// 	console.log("output aqui -");
+					// 	console.log(data);
+					// });					 
+					// // Stderr
+					// ps.on("error-output", data => {
+					// 	console.error(data);
+					// });					 
+					// // End
+					ps.on("output", data => {
+						console.log("Aqui: ", data);
+						var esperado = fs.readFileSync('./public/contest/'+id_room+'/'+id_problem+'/out'+data+'.txt', 'utf-8');
+						var resultado = fs.readFileSync('./public/respostas/'+id_sub+'-'+data+'.txt', 'utf-8');
+						console.log("Eserado: ", esperado);
+						console.log("Resultado: ", resultado);
+						if(esperado == resultado){
+							aceitacao = aceitacao + 1;
+							console.log(data, ": aceito")
+						} else {
+							console.log("Código recusado");
+							recusado = recusado + 1;
+							let remove = new PowerShell('Remove-Item ./public/jugamento.exe');
+							ij = qnt;
 						}
 					});
 				}
-				cmd.run('del jugamento.exe');
+				// for(var ij = 1; ij <= qnt; ij++){
+					// var resultado 
+					// let teste;
+					// var esperado = fs.readFile('./public/contest/'+id_room+'/'+id_problem+'/out'+ij+'.txt', 'utf-8', function (err2, esperado) {
+					// 	console.log("Esperado: ", esperado);
+					// });					
+					// var resultado = fs.readFile('./public/respostas/'+id_sub+'-'+ij+'.txt', 'utf-8', function (err, resultado) {
+					// 	console.log("Resultado: ", resultado);
+					// });
+					
+					// console.log("Resultado: ", resultado);
+					// console.log("Esperado: ", esperado);
+					// fs.readFile('./public/respostas/'+id_sub+'-'+ij+'.txt', 'utf-8', function (err, resultado) {
+					// 	if (err) {
+					// 		console.log(err);
+					// 	} else {
+					// 		fs.readFile('./public/contest/'+id_room+'/'+id_problem+'/out'+ij+'.txt', 'utf-8', function (err2, esperado) {
+					// 			if (err2) {
+					// 				console.log(err2);
+					// 			} else {
+					// 				console.log("Resultado: ");
+					// 				console.log("Esperado: ");
+					// 				// if(resultado == esperado){
+					// 				// 	console.log("codigo Aceito");
+					// 				// 	aceitacao = ij;
+					// 				// } else {
+					// 				// 	console.log("codigo nao aceito");
+					// 				// 	recusado = ij;
+					// 				// 	let remove = new PowerShell('Remove-Item ./public/jugamento.exe');
+					// 				// 	return -1;
+					// 				// }
+					// 			}
+					// 		});
+					// 	}
+					// });
+					// cmd.run('jugamento.exe < ./public/contest/'+id_room+'/'+id_problem+'/in'+ij+'.txt > ./public/respostas/'+id_sub+'-'+ij+'.txt');
+				// }
+				let remove = new PowerShell('Remove-Item ./public/jugamento.exe');
 				return -1;
 			}
 			var cont_sub = 0;
@@ -327,11 +369,11 @@ module.exports = function(app) {
 								res.write('<script>alert("Falha ao enviar!"); window.location="../"</script>');
 							}
 							else {
-								cmd.run('g++ ./public/resolutions/'+filename+' -o jugamento.exe');
-								for(var k = 0; k < 1000000000; k++){
-									var x = k;
+								cmd.run('g++ ./public/resolutions/'+filename+' -o ./public/jugamento.exe');
+								for(var i = 0; i < 10000000; i++){
+									var teste = i;
 								}
-								model.resposta = judge();
+								model.resposta = judge();						
 								model.save(function(err){
 									if (err) {
 										console.log(err);
