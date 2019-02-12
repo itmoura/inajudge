@@ -7,6 +7,7 @@ var cmd = require('node-cmd');
 var Promise = require('bluebird');
 const getAsync = Promise.promisify(cmd.get, { multiArgs: true, context: cmd });
 const PowerShell = require("powershell");
+const perf = require('execution-time')();
 
 
 module.exports = function(app) {
@@ -140,6 +141,9 @@ module.exports = function(app) {
 											letra_problem: {
 												$push: "$letra_problem"
 											},
+											caso_teste: {
+												$push: "$caso_teste"
+											},
 											count: { 
 												$sum: 1 
 											}
@@ -185,6 +189,9 @@ module.exports = function(app) {
 												},
 												letra_problem: {
 													$push: "$letra_problem"
+												},
+												caso_teste: {
+													$push: "$caso_teste"
 												},
 												count: { 
 													$sum: 1 
@@ -234,111 +241,61 @@ module.exports = function(app) {
 	  		res.render('competition/create', { title: 'Crie sua competição' });
 		},
 		submitProblem: function(req, res, next){
+			cmd.get(
+				'if exist ./public/jugamento.exe echo 1',
+				function(err, data, stderr){
+					if(data == 1){
+						let remove = new PowerShell('Remove-Item ./public/jugamento.exe');
+						console.log("não achei arquivo: ", data);
+						return -9;
+					}
+				}
+			);
 			function judge(){
-				var qnt = 2;
+				var qnt = n_casos;
 				for(var i = 0; i < 10000000; i++){
 				}
-				var aceitacao = 0;
-				var recusado = 0;
 				for(var ij = 1; ij <= qnt; ij++){
-					// $data1 = Get-Date -format ss
+					console.log(ij);
 					let ps = new PowerShell
 					(`
-						$data1 = Get-Date -format fff
-						$data1 = 999 - $data1
-						$proc = Start-Process -FilePath './public/jugamento.exe' -RedirectStandardInput './public/contest/`+id_room+`/`+id_problem+`/in`+ij+`.txt' -RedirectStandardOutput './public/respostas/`+id_sub+`-`+ij+`.txt' -PassThru -Wait -WindowStyle Maximized
-						$timeouted = 4
-						$proc | Wait-Process -Timeout 1 -ErrorAction SilentlyContinue -ErrorVariable timeouted 
-						$data2 = Get-Date -format fff
-						$data2 = 999 - $data2
-						$tempo = $data1 - $data2
-						if ($timeouted){
-							echo 0
-							$proc.Kill()
-						} else {
-							echo `+ij+`
+						$maximumRuntimeSeconds = 2
+
+						$process = Start-Process './public/jugamento.exe' -RedirectStandardInput './public/contest/`+id_room+`/`+id_problem+`/in`+ij+`.txt' -RedirectStandardOutput './public/respostas/`+id_sub+`-`+ij+`.txt'
+
+						try
+						{
+							$process | Wait-Process -Timeout $maximumRuntimeSeconds -ErrorAction Stop
+							Write-Warning -Message 'Process successfully completed within timeout.' 
+						}
+						catch
+						{
+							Write-Warning -Message 'Process exceeded timeout, will be killed now.'
+							$process | Stop-Process -Force
 						}
 					`);
-					// Clear-Content -Path './public/respostas/`+id_sub+`-`+ij+`.txt' -Force
-					// Add-Content -Path './public/respostas/error-`+id_sub+`-`+ij+`.txt' -Value 1
-					// $data2 = Get-Date -format ss
-					// 	$tempo = $data2 - $data1
-					// ps.on("error", err => {
-					// 	console.error(err);
-					// });					 
-					// // Stdout
-					// ps.on("output", data => {
-					// 	console.log("output aqui -");
-					// 	console.log(data);
-					// });					 
-					// // Stderr
-					// ps.on("error-output", data => {
-					// 	console.error(data);
-					// });					 
-					// // End
 					ps.on("output", data => {
-						console.log("Aqui: ", data);
-						var esperado = fs.readFileSync('./public/contest/'+id_room+'/'+id_problem+'/out'+data+'.txt', 'utf-8');
-						var resultado = fs.readFileSync('./public/respostas/'+id_sub+'-'+data+'.txt', 'utf-8');
-						console.log("Eserado: ", esperado);
-						console.log("Resultado: ", resultado);
-						if(esperado == resultado){
-							aceitacao = aceitacao + 1;
-							console.log(data, ": aceito")
-						} else {
-							console.log("Código recusado");
-							recusado = recusado + 1;
-							let remove = new PowerShell('Remove-Item ./public/jugamento.exe');
-							ij = qnt;
-						}
+						console.log("Aqui: ", data);				
 					});
-				}
-				// for(var ij = 1; ij <= qnt; ij++){
-					// var resultado 
-					// let teste;
-					// var esperado = fs.readFile('./public/contest/'+id_room+'/'+id_problem+'/out'+ij+'.txt', 'utf-8', function (err2, esperado) {
-					// 	console.log("Esperado: ", esperado);
-					// });					
-					// var resultado = fs.readFile('./public/respostas/'+id_sub+'-'+ij+'.txt', 'utf-8', function (err, resultado) {
-					// 	console.log("Resultado: ", resultado);
-					// });
+					// $data1 = Get-Date -format fff
+					// $data1 = 999 - $data1
+					// $data2 = Get-Date -format fff
+					// $data2 = 999 - $data2
+					// $tempo = $data1 - $data2
 					
-					// console.log("Resultado: ", resultado);
-					// console.log("Esperado: ", esperado);
-					// fs.readFile('./public/respostas/'+id_sub+'-'+ij+'.txt', 'utf-8', function (err, resultado) {
-					// 	if (err) {
-					// 		console.log(err);
-					// 	} else {
-					// 		fs.readFile('./public/contest/'+id_room+'/'+id_problem+'/out'+ij+'.txt', 'utf-8', function (err2, esperado) {
-					// 			if (err2) {
-					// 				console.log(err2);
-					// 			} else {
-					// 				console.log("Resultado: ");
-					// 				console.log("Esperado: ");
-					// 				// if(resultado == esperado){
-					// 				// 	console.log("codigo Aceito");
-					// 				// 	aceitacao = ij;
-					// 				// } else {
-					// 				// 	console.log("codigo nao aceito");
-					// 				// 	recusado = ij;
-					// 				// 	let remove = new PowerShell('Remove-Item ./public/jugamento.exe');
-					// 				// 	return -1;
-					// 				// }
-					// 			}
-					// 		});
-					// 	}
-					// });
-					// cmd.run('jugamento.exe < ./public/contest/'+id_room+'/'+id_problem+'/in'+ij+'.txt > ./public/respostas/'+id_sub+'-'+ij+'.txt');
-				// }
-				let remove = new PowerShell('Remove-Item ./public/jugamento.exe');
-				return -1;
+					
+				}
+				
+				return 0;
 			}
 			var cont_sub = 0;
 			var filename = req.file.filename;
 			var id_room = req.body.id_room;
 			var id_problem = req.body.id_problem;
 			var id_competidor = req.user._id;
-			var nome_competidor = req.user.nome;			
+			var nome_competidor = req.user.nome;
+			var n_casos = 0;
+			var tempo = 0;	
 			var model = new Submit;
 			model.id_competidor = id_competidor;
 			model.nome_competidor = nome_competidor;
@@ -363,29 +320,97 @@ module.exports = function(app) {
 							console.log('Deu erro em room'+err);
 						}
 						model.letra_problem = getLetra.letra;
+						model.caso_teste = getLetra.caso_teste;
+						n_casos = getLetra.caso_teste;
+						tempo = getLetra.time;
 						model.save(function(err){
 							if (err) {
 								console.log(err);
 								res.write('<script>alert("Falha ao enviar!"); window.location="../"</script>');
 							}
 							else {
-								cmd.run('g++ ./public/resolutions/'+filename+' -o ./public/jugamento.exe');
-								for(var i = 0; i < 10000000; i++){
-									var teste = i;
-								}
-								model.resposta = judge();						
-								model.save(function(err){
-									if (err) {
-										console.log(err);
-										res.write('<script>alert("Falha ao enviar!"); window.location="../"</script>');
-									} else {
-										res.redirect('/competition/room/'+id_room);
+								cmd.get(
+									'g++ ./public/resolutions/'+filename+' -o ./public/jugamento.exe',
+									function(err, data, stderr){
+										if(!err){
+											model.resposta = judge();
+											model.save(function(err2){
+												if (err2) {
+													console.log(err2);
+													res.write('<script>alert("Falha ao enviar!"); window.location="../"</script>');
+												} else {
+													res.redirect('/competition/room/'+id_room+'#nav-submissoes');
+												}
+											});
+										} else {
+											model.resposta = 9;
+											model.save(function(err2){
+												if (err2) {
+													console.log(err2);
+													res.write('<script>alert("Falha ao enviar!"); window.location="../"</script>');
+												} else {
+													res.redirect('/competition/room/'+id_room+'#nav-submissoes');
+												}
+											});
+										}
 									}
-								});
+								);
+								// cmd.run('');
+								// for(var i = 0; i < 10000000; i++){
+								// }
+								
 							}
 						});
 					  });
 				});
+			});
+		},
+		verificarResp: function(req, res){
+			Submit.findById(req.body.id_submit, function(err, data){
+				if (err) {
+					console.log(err);
+				} else {
+					var model = data;
+					var id_submit = req.body.id_submit;
+					var id_room = model.id_room;
+					var aceitacao = 0;
+					var i = 1;
+					var recusado = false;
+					var timeout = false;
+					for(i; i <= 2; i++){
+						var esperado = fs.readFileSync('./public/contest/'+id_room+'/'+model.id_problem+'/out'+i+'.txt', 'utf-8');
+						var resultado = fs.readFileSync('./public/respostas/'+id_submit+'-'+i+'.txt', 'utf-8');
+						if(esperado == resultado){
+							aceitacao = aceitacao + 1;
+							console.log(aceitacao+": aceito");
+						} else if(resultado == "#deuTimeOut") {
+							console.log("Timeout");
+							timeout = true;
+							recusado = true;
+							i = 3;
+						} else {
+							console.log("Código recusado");
+							recusado = true;
+							i = 3;
+						}
+					}
+					if(recusado == false){
+						model.resposta = 1;
+					} else {
+						if(timeout == true){
+							model.resposta = -2;
+						} else {
+							model.resposta = -1;
+						}
+					}
+					model.save(function(err){
+						if (err) {
+							console.log(err);
+						} else{
+							res.redirect('/competition/room/'+id_room+'#nav-submissoes');
+						}
+					});
+				}
 			});
 		},
 		create_room: function(req, res){
@@ -538,6 +563,7 @@ module.exports = function(app) {
 			model.txt_saida = req.body.txt_saida;
 			model.exp_entrada = req.body.exp_entrada;
 			model.exp_saida = req.body.exp_saida;
+			model.caso_teste = req.body.caso_teste;
 			model.filename = req.file.arquivo;
 			var id = model._id;
 			var id_competition = req.body.id_competition;

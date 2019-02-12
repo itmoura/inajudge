@@ -121,4 +121,7 @@ nav .container a {color: #ffffff;}
 		.esclarecimento {margin-top: 15px;}
 		.esclarecimento span {color: darkgrey;}
 		.esclarecimento .letraProblema {right: 20px; position: absolute;}
+	/* SUBMIT */
+		.active {display: block;}
+		.desativo {display: none;}
 	

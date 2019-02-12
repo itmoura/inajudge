@@ -57,5 +57,9 @@ module.exports = function(app){
 	app.post('/respesclarecimento/:id', competition.respesclarecimento);
 	app.post('/respesclarecimento/:id', competition.respesclarecimento);
 
+	/* --- */
+	app.post('/verificarResp', competition.verificarResp);
+	
+
 	
 };

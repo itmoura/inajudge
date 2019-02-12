@@ -68,16 +68,29 @@ block content
                                             .col-md-3.floatLeft
                                                 a.card.sucesso(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
                                                     div.topo
+                                                        p Certo
                                                         i.large.material-icons.face face
                                                     p #{lista.letra} - #{lista.nome} 
                                             - achou = true;
                                             - saida = true;
                                             - break;
                                         - }
-                                        - if(achou == false && subProblemId == submissoes.id_problem[k] && k == tam-1){
+                                        - if(achou == false && subProblemId == submissoes.id_problem[k] && k == tam-1 && submissoes.resposta[k] == '-1'){
                                             .col-md-3.floatLeft
                                                 a.card.falha(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
                                                     div.topo
+                                                        p Errado
+                                                        i.large.material-icons.face face
+                                                    p #{lista.letra} - #{lista.nome}
+                                            - achou = true;
+                                            - saida = true;
+                                            - break;
+                                        - }  
+                                        - if(achou == false && subProblemId == submissoes.id_problem[k] && k == tam-1 && submissoes.resposta[k] == '-2'){
+                                            .col-md-3.floatLeft
+                                                a.card.falha(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
+                                                    div.topo
+                                                        p Timeout
                                                         i.large.material-icons.face face
                                                     p #{lista.letra} - #{lista.nome}
                                             - achou = true;
@@ -90,6 +103,7 @@ block content
                                 .col-md-3.floatLeft.normal
                                     a.card(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
                                         div.topo
+                                            p Não enviado
                                             i.large.material-icons.face face
                                         p #{lista.letra} - #{lista.nome} 
                             -}                            
@@ -127,7 +141,7 @@ block content
                                 th(scope='col') Nome
                                 each lista, i in listProblems
                                     th(scope='col')
-                                        p.tpBallon(style="background-color:"+lista.cor) #{lista.letra}
+                                        p.tpBallon(style="background-color: "+lista.cor) #{lista.letra}
                                 th(scope='col') Total
                                 th(scope='col') Time
                         tbody
@@ -154,9 +168,11 @@ block content
                                             //- TRANSFORMA HORA DE ENVIO EM MINUTOS
                                             -var data_envio = moment(competidor.hora_data[k]).format();
                                             -var diff2 = moment(data_fim).diff(data_envio, 'minutes');
-                                            -if(subProblemId == problemId && competidor.resposta[k] == '0' && diff2 >= listaCompetiton.trava_placar){
-                                                - erro++;
-                                                -penalizacao = penalizacao + 20;
+                                            -if(subProblemId == problemId && diff2 >= listaCompetiton.trava_placar){
+                                                -if(competidor.resposta[k] == '-1' || competidor.resposta[k] == '0'){
+                                                    - erro++;
+                                                    - penalizacao = penalizacao + 20;
+                                                - }
                                             - }
                                             -if(subProblemId == problemId && competidor.resposta[k] == '1' && diff2 >= listaCompetiton.trava_placar){
                                                 -var diff = moment(data_envio).diff(data_inicio, 'minutes');
@@ -165,7 +181,7 @@ block content
                                                 -acertou = true;
                                                 -tempoAcumulado = tempoAcumulado + diff + penalizacao;
                                                 td.acerto #{erro+acerto}
-                                                    p #{diff}
+                                                    p #{tempoAcumulado}
                                                 -break;
                                             -}
                                         -}
@@ -199,16 +215,27 @@ block content
                             -var hora_inicio = moment(listaCompetiton.data_inicio).format();
                             -var data_inicio = moment(hora_inicio).format();
                             each listaS, i in listaSubmit
+                                - var id_problem2 = string(listaS.id_problem).splitLeft(',');
+                                - var id_problem = id_problem2[0];
                                 tr
                                     th(scope='row') #{listaS.cont_sub}
                                     each lista, i in listProblems
-                                        if(lista._id == listaS.id_problem)
+                                        if(lista._id == id_problem)
                                             td 
                                                 a.tpBallonA(href="/resolutions/"+listaS.filename target="_blank" style="text-align: center; margin-left: 20px; background-color: "+lista.cor download) #{lista.letra}
-                                    if(listaS.resposta == 0)
+                                    if(listaS.resposta == -1)
                                         td(style="color: tomato") Recusada
+                                    if(listaS.resposta == -2)
+                                        td(style="color: yellow") Timeout
                                     else if(listaS.resposta == 1)
                                         td(style="color: green") Aceito
+                                    else if(listaS.resposta == 0)
+                                        td
+                                            .loadButon.active
+                                                p Verficando Arquivos
+                                            form.form-group.loadButon2.desativo(action='/verificarResp/', method='post')
+                                                input(type="hidden", name="id_submit", value=listaS._id)
+                                                button.btn.btn-primary(type='submit') Verificar
                                     -var time = moment(listaS.hora_data).diff(data_inicio, 'minutes')
                                     td #{time}
         //- FIM TAB 3
@@ -305,3 +332,10 @@ block content
 
             });
         });
+        setTimeout(function(){ 
+            $('.loadButon').removeClass('active');
+            $('.loadButon').addClass('desativo');
+
+            $('.loadButon2').removeClass('desativo');
+            $('.loadButon2').addClass('active');
+        }, 3000);

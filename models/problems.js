@@ -14,6 +14,7 @@ module.exports = function(){
 		txt_saida: String,
 		exp_entrada: String,
 		exp_saida: String,
+		caso_teste: String,
 		arquivo: String
 	});
 
