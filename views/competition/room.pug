@@ -5,7 +5,7 @@ block content
     .container
         .row
             .col-md-8.floatLeft
-                h1= listaCompetiton.titulo + " "
+                h1.text-blue= listaCompetiton.titulo + " "
                     if(user._id == listaCompetiton.id_autor)
                         button.btn.btn-warning(data-toggle="modal" data-target='#edtCompeticao') Editar
                         button.btn.btn-danger(data-toggle="modal", data-target='#deleteCompeticao', style="margin-left: 10px;") Deletar
@@ -66,11 +66,12 @@ block content
                                     - if(submissoes.id_competidor[k] == user._id){
                                         - if(subProblemId == submissoes.id_problem[k] && submissoes.resposta[k] == '1'){
                                             .col-md-3.floatLeft
-                                                a.card.sucesso(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
+                                                div.card.sucesso
                                                     div.topo
-                                                        p Certo
-                                                        i.large.material-icons.face face
-                                                    p #{lista.letra} - #{lista.nome} 
+                                                        a(href="#")
+                                                            i.large.material-icons.delete(style="color: red;") delete
+                                                        //- i.large.material-icons.face face
+                                                    a(href=listaCompetiton._id+'/submit/'+lista._id target="_blank" style="color: #000000;") #{lista.letra} - #{lista.nome} 
                                             - achou = true;
                                             - saida = true;
                                             - break;

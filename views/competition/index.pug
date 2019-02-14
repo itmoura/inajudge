@@ -4,9 +4,9 @@ block content
     .container
         .row
             .col-md-9
-                h1= title
+                h4.text-blue Competição
             .col-md-3
-                a.btn.btn-primary(href="http://localhost:4000/competition/create", style="float: right;") Criar Competição
+                button.btn.btn-primary(style="float: right;", data-toggle="modal" data-target='#createCompeticao') Criar Competição
             section.col-md-12
                 section.escolha
                     //- #myTab.nav.nav-tabs(role='tablist')
@@ -120,7 +120,7 @@ block content
                                                                 input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)
                                                             else
                                                                 p Essa sala possui senha, insira a senha abaixo e entre
-                                                                input.form-control.col-md-4.senha(type='text', name='senha', placeholder="Senha")
+                                                                input.form-control.col-md-4.senha(type='password', name='senha', placeholder="Senha")
                                                                 input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)                                      
                                                                 br
                                                             p#erroSenha(style="display: none; color: red;") Senha incorreta     
@@ -227,7 +227,7 @@ block content
                                                                 input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)
                                                             else
                                                                 p Essa sala possui senha, insira a senha abaixo e entre
-                                                                input.form-control.col-md-4.senha(type='text', name='senha', placeholder="Senha")
+                                                                input.form-control.col-md-4.senha(type='password', name='senha', placeholder="Senha")
                                                                 input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id) 
                                                             p#erroSenha(style="display: none;") Senha incorreta                                    
                                                                 br
@@ -335,7 +335,7 @@ block content
                                                                 input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)
                                                             else
                                                                 p Essa sala possui senha, insira a senha abaixo e entre
-                                                                input.form-control.col-md-4.senha(type='text', name='senha', placeholder="Senha")
+                                                                input.form-control.col-md-4.senha(type='password', name='senha', placeholder="Senha")
                                                                 input.form-control.col-md-4._id(type='hidden', name='_id', value=""+lista._id)                                      
                                                                 br
                                                         .modal-footer
@@ -365,6 +365,24 @@ block content
                                                                     });
                                                                 });
                                 table.table
+    .modal.fade(tabindex='-1', role='dialog', aria-labelledby='myLargeModalLabel', aria-hidden='true', id='createCompeticao')
+        .modal-dialog(role='document')
+            .modal-content
+                .modal-header
+                    h5#exampleModalLabel.modal-title Criando competição
+                    button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') ×
+                form.form-group.create_competition(action='/create_room', method='post')
+                    .modal-body
+                        input.form-control(type='text', name='title', placeholder="Título", required)
+                        input.form-control(id="datetime", type="datetime-local", name='data_inicio' placeholder="Data", required)
+                        input.form-control(id="datetime", type="datetime-local", name='data_fim' placeholder="Data", required)
+                        input.form-control(id="number", type="number", name='trava_placar' placeholder="Travar Placar", required)
+                        textarea.form-control(type='text', name='description', placeholder="Descrição" cols="30", rows="10", required)
+                        input.form-control(type='text', name='senha', placeholder="Senha")
+                    .modal-footer
+                        button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
+                        button.btn.btn-primary(type='submit') Enviar
     block addItem
         script.
             $(document).ready(function(){

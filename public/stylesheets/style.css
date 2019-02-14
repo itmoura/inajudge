@@ -1,10 +1,14 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+header {
+	font-family: 'Montserrat', sans-serif;
+}
 body {
-  	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+	font-family: 'Montserrat', sans-serif;
+  	/* font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; */
 }
 
 a {
-  	color: #00B7FF;
-	
+  	color: #00B7FF;	
 }
 a:hover {
 	text-decoration: none !important;
@@ -24,8 +28,12 @@ a:hover {
 .account-wall form input {margin-bottom: 10px;}
 
 
-nav {background-color: cornflowerblue; margin-bottom: 15px; padding-top: 10px;}
+nav {background-color: cornflowerblue; margin-bottom: 15px; height: 70px;}
+nav .topMargin {margin-top: 8px;}
+nav .topMargin i {margin-right: 6px;}
 nav .container a {color: #ffffff;}
+
+.text-blue {color: cornflowerblue;}
 
 /* RODAPE */
 .rodape {margin-top: 15px;}

@@ -30,7 +30,7 @@
     "nexe": "^2.0.0-rc.28",
     "node-cmd": "*",
     "node-run-cmd": "^1.0.1",
-    "nodemon": "^1.18.9",
+    "nodemon": "^1.18.10",
     "npm": "^6.4.1",
     "passport": "~0.2.0",
     "passport-local": "~1.0.0",

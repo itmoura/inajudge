@@ -19,19 +19,19 @@ html(lang="pt-br")
 		header
 			nav#nav.navbar
 				.container
-					.navbar-header
+					.navbar-header.topMargin
 						.navbar-brand
 							a(href='/competition/')
-								p(style="margin-top: 15px;") INATEL
-					.col-md-3.floatRight(style="margin-top: 15px;")
-						.col-md-6.floatLeft
+								p INATEL ONLINE JUDGE
+					.col-md-3.floatRight
+						.col-md-6.floatLeft.topMargin
 							a(href="/competition/")
 								i.material-icons.floatLeft account_circle
-								p.floatLeft(style="margin-left: 10px;") Perfil
-						.col-md-6.floatLeft
+								p.floatLeftPerfil Perfil
+						.col-md-6.floatLeft.topMargin
 							a(href="/logout")
 								i.material-icons.floatLeft power_settings_new
-								p.floatLeft(style="margin-left: 10px;") Sair
+								p.floatLeft Sair
 		block content
 	rodape
 		.rodape
