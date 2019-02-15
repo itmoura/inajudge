@@ -66,12 +66,10 @@ block content
                                     - if(submissoes.id_competidor[k] == user._id){
                                         - if(subProblemId == submissoes.id_problem[k] && submissoes.resposta[k] == '1'){
                                             .col-md-3.floatLeft
-                                                div.card.sucesso
+                                                a(href=listaCompetiton._id+'/submit/'+lista._id target="_blank").card.sucesso
                                                     div.topo
-                                                        a(href="#")
-                                                            i.large.material-icons.delete(style="color: red;") delete
-                                                        //- i.large.material-icons.face face
-                                                    a(href=listaCompetiton._id+'/submit/'+lista._id target="_blank" style="color: #000000;") #{lista.letra} - #{lista.nome} 
+                                                        i.large.material-icons.insert_emoticon insert_emoticon
+                                                    p #{lista.letra} - #{lista.nome} 
                                             - achou = true;
                                             - saida = true;
                                             - break;
@@ -81,7 +79,7 @@ block content
                                                 a.card.falha(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
                                                     div.topo
                                                         p Errado
-                                                        i.large.material-icons.face face
+                                                        i.large.material-icons.sentiment_very_dissatisfied sentiment_very_dissatisfied
                                                     p #{lista.letra} - #{lista.nome}
                                             - achou = true;
                                             - saida = true;
@@ -92,7 +90,7 @@ block content
                                                 a.card.falha(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
                                                     div.topo
                                                         p Timeout
-                                                        i.large.material-icons.face face
+                                                        i.large.material-icons.sentiment_dissatisfied sentiment_dissatisfied
                                                     p #{lista.letra} - #{lista.nome}
                                             - achou = true;
                                             - saida = true;
@@ -105,7 +103,7 @@ block content
                                     a.card(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
                                         div.topo
                                             p Não enviado
-                                            i.large.material-icons.face face
+                                            i.large.material-icons.sentiment_satisfied sentiment_satisfied
                                         p #{lista.letra} - #{lista.nome} 
                             -}                            
 
@@ -116,9 +114,8 @@ block content
                                 input(value=user._id, name="id_competidor", type="hidden")
                                 input(value=user.nome, name="nome_competidor", type="hidden")
                                 select#language.form-control(name="language", required)
-                                    option(value=" ") Selecione a linguagem 
-                                    option(value="C") C
-                                    option(value="C++") C+
+                                    option Selecione a linguagem
+                                    option(value="C++") C++
                                 select#problem.form-control(name="id_problem", required)
                                     option Selecione o problema
                                     each lista, i in listProblems
@@ -311,7 +308,7 @@ block content
                     p Deseja deletar essa competição? Será deletado todos as submissões e problemas cadastrados
                 .modal-footer
                     button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
-                    a.btn.btn-primary(href="/delete_competicao/"+listaCompetiton._id) Excluir
+                    a.btn.btn-danger(href="/delete_competicao/"+listaCompetiton._id) Excluir
     block addItem
     script.
         $(document).ready(function(){
