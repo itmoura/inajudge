@@ -138,6 +138,9 @@ module.exports = function(app) {
 											data_atual: {
 												$push: "$data_atual"
 											},
+											hora_data: {
+												$push: "$hora_data"
+											},
 											letra_problem: {
 												$push: "$letra_problem"
 											},
@@ -445,6 +448,7 @@ module.exports = function(app) {
 					model.senha = req.body.senha;
 					model.data_inicio = req.body.data_inicio;
 					model.data_fim = req.body.data_fim;
+					model.trava_placar = req.body.trava_placar;
 					model.titulo = req.body.titulo;
 					model.descricao = req.body.descricao;
 					model.save(function(err){
