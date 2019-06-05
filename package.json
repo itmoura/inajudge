@@ -1,6 +1,9 @@
 {
   "name": "judge",
   "version": "0.1.6",
+  "engines": {
+    "node": "8.16.0"
+  },
   "private": true,
   "scripts": {
     "start": "node ./bin/www"

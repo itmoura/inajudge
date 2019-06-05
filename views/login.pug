@@ -19,9 +19,8 @@ html
         div.container
             div.row
                 div.account-wall
-                    h1.text-center.login-title Acesse Judge INATEL
-                    div
-                        img(class='profile-img', src='https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=120')
+                    div(style="margin-top: 50px;")
+                        img(class='profile-img', src='images/inajudge.png', style="margin-left: -9px;")
                         form(class='form-signin', action='/login', method='POST')
                             input(type='text', name='username' class='form-control', placeholder='Email',required, autofocus)
                             input(type='password', name='password' class='form-control', placeholder='Senha', required)

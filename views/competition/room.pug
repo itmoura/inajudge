@@ -70,50 +70,54 @@ block content
                     .col-md-9.floatLeft
                         each lista, i in listProblems
                             - var saida = false;
+                            - var success = false;
+                            - var fail = false;
+                            - var time = false;
                             each submissoes, j in submitProblem
                                 - var tam = submitProblem[j].count;
                                 - var subProblemId = listProblems[i]._id;
-                                - var achou = false;
                                 -var hora_fim = moment(listaCompetiton.data_fim).format(); //v
                                 -var data_fim = moment(hora_fim).format(); //v
-                                -for(var k = 0; k < tam; k++){        
+                                -for(var k = 0; k < tam; k++){
                                     - if(submissoes.id_competidor[k] == user._id){
                                         -var data_envio = moment(submissoes.hora_data[k]).format(); // v 
                                         -var diff2 = moment(data_fim).diff(data_envio, 'minutes'); //v
                                         - if(diff2 >= listaCompetiton.trava_placar){
                                             - if(subProblemId == submissoes.id_problem[k] && submissoes.resposta[k] == '1'){
-                                                .col-md-3.floatLeft
-                                                    a(href=listaCompetiton._id+'/submit/'+lista._id target="_blank").card.sucesso
-                                                        div.topo
-                                                            i.large.material-icons.insert_emoticon insert_emoticon
-                                                        p #{lista.letra} - #{lista.nome} 
-                                                - achou = true;
+                                                - success = true;
                                                 - saida = true;
                                                 - break;
                                             - }
-                                            - if(achou == false && subProblemId == submissoes.id_problem[k] && submissoes.resposta[k] == '-1'){
-                                                .col-md-3.floatLeft
-                                                    a.card.falha(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
-                                                        div.topo
-                                                            i.large.material-icons.sentiment_very_dissatisfied sentiment_very_dissatisfied
-                                                        p #{lista.letra} - #{lista.nome}
-                                                - achou = true;
+                                            - if(subProblemId == submissoes.id_problem[k] && submissoes.resposta[k] == '-1'){
+                                                - fail = true;
                                                 - saida = true;
-                                                - break;
                                             - }  
-                                            - if(achou == false && subProblemId == submissoes.id_problem[k] && submissoes.resposta[k] == '-2'){
-                                                .col-md-3.floatLeft
-                                                    a.card.falha(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
-                                                        div.topo
-                                                            i.large.material-icons.sentiment_dissatisfied sentiment_dissatisfied
-                                                        p #{lista.letra} - #{lista.nome}
-                                                - achou = true;
+                                            - if(subProblemId == submissoes.id_problem[k] && submissoes.resposta[k] == '-2'){
+                                                - time = true;
                                                 - saida = true;
-                                                - break;
                                             - }      
                                         - }                                  
                                     - }
                                 -}
+                            -if(success == true){
+                                .col-md-3.floatLeft
+                                    a(href=listaCompetiton._id+'/submit/'+lista._id target="_blank").card.sucesso
+                                        div.topo
+                                            i.large.material-icons.insert_emoticon insert_emoticon
+                                        p #{lista.letra} - #{lista.nome} 
+                            -} else if(time == true){
+                                .col-md-3.floatLeft
+                                    a.card.falha(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
+                                        div.topo
+                                            i.large.material-icons.sentiment_dissatisfied sentiment_dissatisfied
+                                        p #{lista.letra} - #{lista.nome}
+                            -} else if(fail == true){
+                                .col-md-3.floatLeft
+                                    a.card.falha(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")
+                                        div.topo
+                                            i.large.material-icons.sentiment_very_dissatisfied sentiment_very_dissatisfied
+                                        p #{lista.letra} - #{lista.nome}
+                            -}
                             -if(saida == false){
                                 .col-md-3.floatLeft.normal
                                     a.card(href=listaCompetiton._id+'/submit/'+lista._id target="_blank")

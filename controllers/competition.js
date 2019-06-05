@@ -14,11 +14,11 @@ module.exports = function(app) {
 
 	var Contest = app.models.contests;
 	var Problem = app.models.problems;
-	var Submit = app.models.submits;	
+	var Submit = app.models.submits;
 	var Users = app.models.users;
-	var Esclarecimento = app.models.esclarecimentos;		
+	var Esclarecimento = app.models.esclarecimentos;
 	moment.locale('pt-BR');
-	
+
  	var CompetitionController = {
 		index: function(req,res) {
 			Contest.find().sort( {'_id': -1} ).exec(function(err, data){
@@ -26,7 +26,7 @@ module.exports = function(app) {
 					console.log('Erro na busca de todas as competicoes: '+err);
 				}
 				var data_atual = moment().format();
-				var hora_atual = moment().format('LT'); 
+				var hora_atual = moment().format('LT');
 				res.render('competition/index', { title: 'Veja todas as competições', listContests: data, moment: moment, data_atual: data_atual, user: req.user, hora_atual: hora_atual, string: S });
 			});
 		},
@@ -51,7 +51,7 @@ module.exports = function(app) {
 								if(quebra_competicao[i] == data._id){
 									achou = true;
 									break;
-								}								
+								}
 							}
 							if(achou == false){
 								model.competicoes = model.competicoes + ',' + data._id;
@@ -91,13 +91,13 @@ module.exports = function(app) {
 				if(quebra_competicao[i] == req.params.id){
 					achou = true;
 					break;
-				}								
+				}
 			}
 			if(achou == true){
 				Contest.findById(req.params.id, function(err, data){
 					if (err) {
 						console.log('Deu erro em room'+err);
-					} 
+					}
 					else {
 						Problem.find({'id_competition': data._id}, function(err, data2){
 							if (err) {
@@ -107,19 +107,19 @@ module.exports = function(app) {
 								if (err) {
 									console.log('Deu erro em room'+err);
 								}
-							
+
 							Submit.find({'id_competidor': req.user._id, 'id_room': data._id}).sort( {'_id': -1} ).exec(function(err, dataSubmit){
 								if (err) {
 									console.log('Deu erro em room'+err);
-								} 
-								
+								}
+
 								Submit.aggregate([
-									{ $group : 
-										{ 
-											_id : "$id_problem", 
-											resposta: { 
+									{ $group :
+										{
+											_id : "$id_problem",
+											resposta: {
 												$push: "$resposta"
-											}, 
+											},
 											id_competidor: {
 												$push: "$id_competidor"
 											},
@@ -147,8 +147,8 @@ module.exports = function(app) {
 											caso_teste: {
 												$push: "$caso_teste"
 											},
-											count: { 
-												$sum: 1 
+											count: {
+												$sum: 1
 											}
 										}
 									}
@@ -160,12 +160,12 @@ module.exports = function(app) {
 										submitProblem = 0;
 									}
 									Submit.aggregate([
-										{ $group : 
-											{ 
+										{ $group :
+											{
 												_id : "$id_competidor",
-												resposta: { 
-													$push: "$resposta"												
-												}, 
+												resposta: {
+													$push: "$resposta"
+												},
 												id_competidor: {
 													$push: "$id_competidor"
 												},
@@ -196,8 +196,8 @@ module.exports = function(app) {
 												caso_teste: {
 													$push: "$caso_teste"
 												},
-												count: { 
-													$sum: 1 
+												count: {
+													$sum: 1
 												}
 											}
 										}
@@ -208,9 +208,9 @@ module.exports = function(app) {
 											console.log('Deu erro em room'+err);
 										}
 										res.render('competition/room', {
-											title: data.titulo, listaCompetiton: data, 
-											listProblems: data2, listaSubmit: dataSubmit, 
-											submitProblem: submitProblem, string: S, 
+											title: data.titulo, listaCompetiton: data,
+											listProblems: data2, listaSubmit: dataSubmit,
+											submitProblem: submitProblem, string: S,
 											rank: rank, user: req.user, moment: moment, esclarecimento: data_esclarecimento});
 									});
 								});
@@ -231,12 +231,12 @@ module.exports = function(app) {
 			Problem.findById(req.params.id, function(err, data){
 				if (err) {
 					console.log('Deu erro em room'+err);
-				} 
+				}
 				else {
 					res.render('competition/submit', {title: data.nome, problema: data});
 				}
-			});			
-		},  
+			});
+		},
 		cad_problema: function(req,res) {
 			res.render('competition/problema', { title: 'Cadastre problema', id_competition: req.params.id });
 	  	},
@@ -244,16 +244,16 @@ module.exports = function(app) {
 	  		res.render('competition/create', { title: 'Crie sua competição' });
 		},
 		submitProblem: function(req, res, next){
-			cmd.get(
-				'if exist ./public/jugamento.exe echo 1',
-				function(err, data, stderr){
-					if(data == 1){
-						let remove = new PowerShell('Remove-Item ./public/jugamento.exe');
-						console.log("não achei arquivo: ", data);
-						return -9;
-					}
-				}
-			);
+			// cmd.get(
+			// 	'if exist ./public/jugamento.exe echo 1',
+			// 	function(err, data, stderr){
+			// 		if(data == 1){
+			// 			let remove = new PowerShell('Remove-Item ./public/jugamento.exe');
+			// 			console.log("não achei arquivo: ", data);
+			// 			return -9;
+			// 		}
+			// 	}
+			// );
 			function judge(){
 				var qnt = n_casos;
 				for(var i = 0; i < 10000000; i++){
@@ -262,14 +262,14 @@ module.exports = function(app) {
 					console.log(ij);
 					let ps = new PowerShell
 					(`
-						$maximumRuntimeSeconds = 2
+						$maximumRuntimeSeconds = 3
 
 						$process = Start-Process './public/jugamento.exe' -RedirectStandardInput './public/contest/`+id_room+`/`+id_problem+`/in`+ij+`.txt' -RedirectStandardOutput './public/respostas/`+id_sub+`-`+ij+`.txt'
 
 						try
 						{
 							$process | Wait-Process -Timeout $maximumRuntimeSeconds -ErrorAction Stop
-							Write-Warning -Message 'Process successfully completed within timeout.' 
+							Write-Warning -Message 'Process successfully completed within timeout.'
 						}
 						catch
 						{
@@ -278,17 +278,17 @@ module.exports = function(app) {
 						}
 					`);
 					ps.on("output", data => {
-						console.log("Aqui: ", data);				
+						console.log("Aqui: ", data);
 					});
 					// $data1 = Get-Date -format fff
 					// $data1 = 999 - $data1
 					// $data2 = Get-Date -format fff
 					// $data2 = 999 - $data2
 					// $tempo = $data1 - $data2
-					
-					
+
+
 				}
-				
+
 				return 0;
 			}
 			var cont_sub = 0;
@@ -298,14 +298,14 @@ module.exports = function(app) {
 			var id_competidor = req.user._id;
 			var nome_competidor = req.user.nome;
 			var n_casos = 0;
-			var tempo = 0;	
+			var tempo = 0;
 			var model = new Submit;
 			model.id_competidor = id_competidor;
 			model.nome_competidor = nome_competidor;
 			model.id_room = id_room;
 			model.id_problem = id_problem;
 			model.data_atual = moment().format('DD/MM/YYYY');
-			model.hora_atual = moment().format('LT'); 
+			model.hora_atual = moment().format('LT');
 			model.hora_data = moment().format();
 			model.filename = filename;
 			var id_sub = model._id;
@@ -361,7 +361,7 @@ module.exports = function(app) {
 								// cmd.run('');
 								// for(var i = 0; i < 10000000; i++){
 								// }
-								
+
 							}
 						});
 					  });
@@ -434,7 +434,7 @@ module.exports = function(app) {
 				if (err) {
 					console.log(err);
 					res.write('<script>alert("Falha ao cadastrar!"); window.location="../"</script>');
-				}				
+				}
 				res.redirect('/competition/room/'+id);
 	  		});
 		},
@@ -507,7 +507,7 @@ module.exports = function(app) {
 					var id_sala = data._id;
 					// if(data.liberado == null){
 					// 	model.liberado = true;
-					// 	model.data_inicio = 
+					// 	model.data_inicio =
 					// }
 					var verifica = req.params.info;
 					if(verifica == 'false')
@@ -534,7 +534,7 @@ module.exports = function(app) {
 				if (err) {
 					console.log(err);
 					res.write('<script>alert("Falha ao registrar duvida!"); window.location="../"</script>');
-				}				
+				}
 				res.redirect('/competition/room/'+id_competition+'#nav-esclarecimento');
 	  		});
 		},
@@ -549,7 +549,7 @@ module.exports = function(app) {
 					if (err) {
 						console.log(err);
 						res.write('<script>alert("Falha ao responder!"); window.location="../"</script>');
-					}		
+					}
 					res.redirect('/competition/room/'+data.id_competition+'#nav-esclarecimento');
 				});
 			});
@@ -585,7 +585,7 @@ module.exports = function(app) {
 }
 
 
-/* 
+/*
 
 
 upload: function(req, res, next){
@@ -601,20 +601,20 @@ upload: function(req, res, next){
 		if (err) {
 			console.log(err);
 			res.write('<script>alert("Falha ao cadastrar!"); window.location="../"</script>');
-		}				
+		}
 		Contest.findOne().sort({'_id': -1}).exec(function(err, data){
 			function unzip_problem(){
 				fs.createReadStream('./public/contest/'+req.file.filename).pipe(unzip.Extract({ path: './public/contest/'+data._id}));
 			}
 			if (err) {
 				console.log('Deu erro aqui'+err);
-			}					
+			}
 			var nome_problemas = req.body.nome_problemas;
-			var nome_final = S(nome_problemas).splitLeft(';');					
+			var nome_final = S(nome_problemas).splitLeft(';');
 			var numero = req.body.numero_problemas;
 			var id_competition = data._id;
 			var feito = 0;
-			
+
 			for(var x = 0; x < numero; x++){
 				var model2 = new Problem;
 				model2.id_competition = id_competition;
@@ -627,7 +627,7 @@ upload: function(req, res, next){
 					}
 				});
 				function cad_problems(){
-					fs.readFile('./public/contest/'+id_competition+'/in_'+nome_final[x]+'.txt', 'utf-8', function (err, data2) {						
+					fs.readFile('./public/contest/'+id_competition+'/in_'+nome_final[x]+'.txt', 'utf-8', function (err, data2) {
 						if(err)
 							console.log(err);
 						else {
@@ -635,7 +635,7 @@ upload: function(req, res, next){
 							var teste = S(data2).splitLeft(';');
 							console.log(teste.length);
 							while(n < teste.length){
-								fs.writeFile('./public/contest/'+id_competition+'/in_teste'+nome_final[x]+'-'+n+'.txt', teste[n], (err) => {  
+								fs.writeFile('./public/contest/'+id_competition+'/in_teste'+nome_final[x]+'-'+n+'.txt', teste[n], (err) => {
 									// throws an error, you could also catch it here
 									if (err) throw err;
 								});
@@ -647,7 +647,7 @@ upload: function(req, res, next){
 				if(feito == 0){
 					unzip_problem();
 					feito = 1;
-				}								
+				}
 				setTimeout(cad_problems, 2000);
 			}
 			res.redirect('/competition/');
@@ -656,7 +656,7 @@ upload: function(req, res, next){
 }
 
 
-*/ 
+*/
 
 
 /* ------------------------- */
@@ -664,7 +664,7 @@ upload: function(req, res, next){
 /* COMPARAÇÃO DE RESULTADO */
 // const exec = require('child_process').exec;
 // const fs = require('fs');
-// var cmd = require('node-cmd');				
+// var cmd = require('node-cmd');
 
 // function criando_executavel() {
 // 	cmd.run('g++ ./public/resolutions/'+filename+' -o '+filename+'.exe');
@@ -677,10 +677,10 @@ upload: function(req, res, next){
 // 		var teste = S(data).splitLeft(';');
 // 		while(n < 2){
 // 			console.log(teste[n]);
-// 			fs.writeFile('./public/resolutions/teste'+n+'.txt', teste[n], (err) => {  
+// 			fs.writeFile('./public/resolutions/teste'+n+'.txt', teste[n], (err) => {
 // 				// throws an error, you could also catch it here
 // 				if (err) throw err;
-			
+
 // 				// success case, the file was saved
 // 				console.log('Lyric saved!');
 // 			});
@@ -697,10 +697,10 @@ upload: function(req, res, next){
 // function comparando_resultado(){
 // 	fs.readFile('./public/resolutions/'+filename+'.txt', 'utf-8', function (err, data) {
 // 		// if(err) throw err;
-		
+
 // 		fs.readFile('./public/contest/5b0f13953b3a602398f2350a/out_teste1.txt', 'utf-8', function (err2, data2) {
 // 			// if(err2) throw err2;
-			
+
 // 			console.log(data);
 // 			console.log(data2);
 // 			if(data2 == data)
